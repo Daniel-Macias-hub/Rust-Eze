@@ -1,0 +1,27 @@
+{
+  "name": "rust_eze",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Daniel-Macias-hub/Rust-Eze.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Daniel-Macias-hub/Rust-Eze/issues"
+  },
+  "homepage": "https://github.com/Daniel-Macias-hub/Rust-Eze#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.48.0"
+  }
+}

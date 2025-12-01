@@ -1,30 +1,85 @@
-{% extends "layouts/client_base.html" %}
+{% extends "layouts/admin_base.html" %}
 
-{% block title %}Dashboard - Cliente{% endblock %}
+{% block title %}Dashboard - Admin{% endblock %}
+{% block page_title %}Dashboard Administrativo{% endblock %}
 
-{% block client_content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Mi Dashboard</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{{ url_for('client.catalogo') }}" class="btn btn-primary">
-            <i class="fas fa-car me-2"></i>Ver Catálogo
-        </a>
+{% block admin_content %}
+<div class="row mb-4">
+    <!-- Estadísticas principales -->
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card primary">
+            <div class="card-body text-center">
+                <i class="fas fa-car fa-3x mb-3"></i>
+                <h3>{{ stats.total_vehiculos or 0 }}</h3>
+                <p class="mb-0">Vehículos Totales</p>
+                <small>{{ stats.vehiculos_disponibles or 0 }} disponibles</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card success">
+            <div class="card-body text-center">
+                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                <h3>{{ stats.ventas_mes or 0 }}</h3>
+                <p class="mb-0">Ventas del Mes</p>
+                <small>{{ stats.ingresos_mes|format_currency if stats.ingresos_mes else '$0' }}</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card warning">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <h3>{{ stats.total_clientes or 0 }}</h3>
+                <p class="mb-0">Clientes Activos</p>
+                <small>{{ stats.clientes_nuevos or 0 }} nuevos</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stat-card info">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                <h3>{{ stats.tasa_conversion or 0 }}%</h3>
+                <p class="mb-0">Tasa Conversión</p>
+                <small>Este mes</small>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Bienvenida -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card bg-primary text-white">
+<div class="row">
+    <!-- Gráficos y reportes -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Ventas Mensuales
+                </h5>
+            </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h3 class="card-title">¡Bienvenido, {{ session.user_name }}!</h3>
-                        <p class="card-text">En Rust-Eze encontrará la mejor selección de vehículos con calidad garantizada.</p>
-                        <p class="card-text"><strong>"Calidad, antes que cantidad"</strong></p>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <i class="fas fa-car fa-5x opacity-50"></i>
+                <canvas id="ventasChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trophy me-2"></i>Top Marcas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="topMarcasList">
+                    <!-- Se llenará con JavaScript -->
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -32,105 +87,7 @@
     </div>
 </div>
 
-<div class="row">
-    <!-- Mis Compras Recientes -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Mis Compras Recientes</h5>
-            </div>
-            <div class="card-body">
-                {% if compras %}
-                    <div class="list-group list-group-flush">
-                        {% for compra in compras[:3] %}
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ compra.marca }} {{ compra.modelo }}</h6>
-                                <small class="text-muted">{{ compra.fecha_venta[:10] }}</small>
-                            </div>
-                            <p class="mb-1">${{ "{:,.2f}".format(compra.total_venta) }} - {{ compra.estado_venta }}</p>
-                            <small class="text-muted">Método: {{ compra.metodo_pago }}</small>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% if compras|length > 3 %}
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('client.historial_compras') }}" class="btn btn-outline-primary btn-sm">
-                            Ver todas las compras
-                        </a>
-                    </div>
-                    {% endif %}
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">Aún no tienes compras registradas</p>
-                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-primary">
-                            Explorar Catálogo
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Vehículos Destacados -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fas fa-star me-2"></i>Vehículos Destacados</h5>
-            </div>
-            <div class="card-body">
-                {% if vehiculos %}
-                    <div class="row">
-                        {% for vehiculo in vehiculos %}
-                        <div class="col-12 mb-3">
-                            <div class="card vehicle-card">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        {% if vehiculo.imagen_url %}
-                                        <img src="{{ vehiculo.imagen_url }}" class="img-fluid rounded-start vehicle-img" 
-                                             alt="{{ vehiculo.marca }} {{ vehiculo.modelo }}">
-                                        {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
-                                            <i class="fas fa-car fa-2x text-muted"></i>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h6 class="card-title">{{ vehiculo.marca }} {{ vehiculo.modelo }}</h6>
-                                            <p class="card-text">
-                                                <small class="text-muted">{{ vehiculo.anio }} • {{ vehiculo.color }} • {{ vehiculo.tipo }}</small>
-                                            </p>
-                                            <p class="card-text price-tag mb-2">${{ "{:,.2f}".format(vehiculo.precio) }}</p>
-                                            <button class="btn btn-primary btn-sm" 
-                                                    onclick="solicitarInfo({{ vehiculo.vehiculo_id }})">
-                                                <i class="fas fa-info-circle me-1"></i>Más Info
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-outline-primary">
-                            Ver Catálogo Completo
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-car fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No hay vehículos disponibles en este momento</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Acciones Rápidas -->
+<!-- Acciones rápidas -->
 <div class="row mt-4">
     <div class="col-12">
         <div class="card">
@@ -140,28 +97,28 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-outline-primary w-100 h-100 py-3">
+                        <a href="{{ url_for('admin.vehiculos') }}" class="btn btn-outline-primary w-100 h-100 py-3">
                             <i class="fas fa-car fa-2x mb-2"></i><br>
-                            Explorar Catálogo
+                            Gestionar Vehículos
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('client.historial_compras') }}" class="btn btn-outline-success w-100 h-100 py-3">
-                            <i class="fas fa-history fa-2x mb-2"></i><br>
-                            Mis Compras
+                        <a href="{{ url_for('admin.ventas') }}" class="btn btn-outline-success w-100 h-100 py-3">
+                            <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
+                            Registrar Venta
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('client.perfil') }}" class="btn btn-outline-info w-100 h-100 py-3">
-                            <i class="fas fa-user fa-2x mb-2"></i><br>
-                            Mi Perfil
+                        <a href="{{ url_for('admin.auditoria') }}" class="btn btn-outline-warning w-100 h-100 py-3">
+                            <i class="fas fa-clipboard-check fa-2x mb-2"></i><br>
+                            Ver Auditoría
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <button class="btn btn-outline-warning w-100 h-100 py-3" onclick="contactarAsesor()">
-                            <i class="fas fa-headset fa-2x mb-2"></i><br>
-                            Contactar Asesor
-                        </button>
+                        <a href="{{ url_for('admin.reportes') }}" class="btn btn-outline-info w-100 h-100 py-3">
+                            <i class="fas fa-chart-pie fa-2x mb-2"></i><br>
+                            Reportes Avanzados
+                        </a>
                     </div>
                 </div>
             </div>
@@ -171,21 +128,94 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function solicitarInfo(vehiculoId) {
-    showNotification('📞 Solicitando información del vehículo...', 'info');
-    // Simular solicitud
-    setTimeout(() => {
-        showNotification('✅ Un asesor se contactará con usted pronto', 'success');
-    }, 1500);
+// Cargar top marcas
+async function cargarTopMarcas() {
+    try {
+        const response = await fetch('/admin/api/ranking-marcas');
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            const container = document.getElementById('topMarcasList');
+            let html = '';
+            
+            data.data.forEach((marca, index) => {
+                const badgeColor = index === 0 ? 'bg-warning' : 
+                                 index === 1 ? 'bg-secondary' : 
+                                 index === 2 ? 'bg-danger' : 'bg-info';
+                
+                html += `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                    <div>
+                        <span class="badge ${badgeColor} me-2">${marca.dense_rank}</span>
+                        <strong>${marca.marca}</strong>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${marca.unidades_vendidas} unidades</small>
+                        <small class="text-success">${formatCurrency(marca.ingreso_total)}</small>
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+    } catch (error) {
+        console.error('Error cargando top marcas:', error);
+    }
 }
 
-function contactarAsesor() {
-    showNotification('📞 Conectando con un asesor...', 'info');
-    // Simular conexión
-    setTimeout(() => {
-        showNotification('✅ Un asesor estará con usted en breve', 'success');
-    }, 2000);
+// Inicializar gráfico
+async function inicializarGrafico() {
+    try {
+        const response = await fetch('/admin/api/ventas-por-mes-marca');
+        const data = await response.json();
+        
+        if (data.success) {
+            const ctx = document.getElementById('ventasChart').getContext('2d');
+            
+            // Procesar datos para Chart.js
+            const datasets = [];
+            const meses = new Set();
+            
+            // Aquí procesarías los datos del PIVOT
+            // Por ahora un gráfico de ejemplo
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Ventas 2024',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ventas Mensuales'
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error inicializando gráfico:', error);
+    }
 }
+
+// Cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    cargarTopMarcas();
+    inicializarGrafico();
+});
 </script>
 {% endblock %}

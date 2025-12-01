@@ -75,11 +75,11 @@
                 <div class="card-footer bg-transparent">
                     <div class="btn-group w-100">
                         <button class="btn btn-outline-primary" 
-                                onclick="solicitarTestDrive({{ vehiculo.vehiculo_id }})">
+                             onclick="solicitarTestDrive('{{ vehiculo.vehiculo_id }}')">
                             <i class="fas fa-calendar me-1"></i>Test Drive
                         </button>
                         <button class="btn btn-primary" 
-                                onclick="contactarPorVehiculo({{ vehiculo.vehiculo_id }})">
+                             onclick="contactarPorVehiculo('{{ vehiculo.vehiculo_id }}')">
                             <i class="fas fa-info-circle me-1"></i>Más Info
                         </button>
                     </div>
@@ -101,11 +101,16 @@
 
 {% block extra_js %}
 <script>
+/* eslint-disable no-unused-vars */
+
+// @ts-ignore
 function aplicarFiltros() {
     const form = document.getElementById('filtrosForm');
+    if (!form) return;
+    
     const formData = new FormData(form);
-    const marcaFiltro = formData.get('marca').toLowerCase();
-    const tipoFiltro = formData.get('tipo').toLowerCase();
+    const marcaFiltro = (formData.get('marca') || 'todas').toLowerCase();
+    const tipoFiltro = (formData.get('tipo') || 'todos').toLowerCase();
     const precioMin = parseFloat(formData.get('precio_min')) || 0;
     const precioMax = parseFloat(formData.get('precio_max')) || Infinity;
 
@@ -113,9 +118,9 @@ function aplicarFiltros() {
     let visibleCount = 0;
 
     vehiculos.forEach(vehiculo => {
-        const marca = vehiculo.dataset.marca;
-        const tipo = vehiculo.dataset.tipo;
-        const precio = parseFloat(vehiculo.dataset.precio);
+        const marca = vehiculo.dataset.marca || '';
+        const tipo = vehiculo.dataset.tipo || '';
+        const precio = parseFloat(vehiculo.dataset.precio) || 0;
 
         const muestraMarca = marcaFiltro === 'todas' || marca === marcaFiltro;
         const muestraTipo = tipoFiltro === 'todos' || tipo === tipoFiltro;
@@ -130,23 +135,40 @@ function aplicarFiltros() {
     });
 
     // Actualizar contador
-    document.querySelector('.badge').textContent = visibleCount + ' vehículos disponibles';
-}
-
-function solicitarTestDrive(vehiculoId) {
-    const fecha = prompt('¿Para qué fecha le gustaría programar el test drive? (YYYY-MM-DD)');
-    if (fecha) {
-        showNotification('📅 Test drive solicitado para ' + fecha, 'info');
-        // Aquí iría la llamada a la API
+    const badge = document.querySelector('.badge');
+    if (badge) {
+        badge.textContent = visibleCount + ' vehículos disponibles';
     }
 }
 
+// @ts-ignore
+function solicitarTestDrive(vehiculoId) {
+    // Convertir a número si es necesario
+    const id = parseInt(vehiculoId);
+    const fecha = prompt(`¿Para qué fecha le gustaría programar el test drive para el vehículo ID ${id}? (YYYY-MM-DD)`);
+    if (fecha) {
+        if (typeof showNotification === 'function') {
+            showNotification(`📅 Test drive solicitado para vehículo ${id} - ${fecha}`, 'info');
+        } else {
+            alert(`📅 Test drive solicitado para vehículo ${id} - ${fecha}`);
+        }
+    }
+}
+
+// @ts-ignore
 function contactarPorVehiculo(vehiculoId) {
-    showNotification('📞 Conectando con asesor para más información...', 'info');
-    // Simular conexión
-    setTimeout(() => {
-        showNotification('✅ Un asesor se contactará con usted pronto', 'success');
-    }, 1500);
+    const id = parseInt(vehiculoId);
+    if (typeof showNotification === 'function') {
+        showNotification(`📞 Conectando con asesor para vehículo ${id}...`, 'info');
+        setTimeout(() => {
+            showNotification(`✅ Un asesor se contactará con usted pronto sobre el vehículo ${id}`, 'success');
+        }, 1500);
+    } else {
+        alert(`📞 Conectando con asesor para vehículo ${id}...`);
+        setTimeout(() => {
+            alert(`✅ Un asesor se contactará con usted pronto sobre el vehículo ${id}`);
+        }, 1500);
+    }
 }
 </script>
 {% endblock %}

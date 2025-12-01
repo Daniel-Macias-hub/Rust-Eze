@@ -1,0 +1,346 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Auditoría del Sistema - Admin{% endblock %}
+{% block page_title %}Auditoría del Sistema{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <button class="btn btn-sm btn-outline-danger" onclick="limpiarAuditoria()">
+            <i class="fas fa-broom me-1"></i>Limpiar Auditoría
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_content %}
+<!-- Estadísticas de Auditoría -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">{{ stats.total_ventas or 0 }}</h3>
+                <p class="text-muted mb-0">Registros Ventas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">{{ stats.total_vehiculos or 0 }}</h3>
+                <p class="text-muted mb-0">Registros Vehículos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-danger">{{ stats.total_errores or 0 }}</h3>
+                <p class="text-muted mb-0">Errores Registrados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">{{ (stats.total_ventas or 0) + (stats.total_vehiculos or 0) + (stats.total_errores or 0) }}</h3>
+                <p class="text-muted mb-0">Total Registros</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pestañas -->
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="auditoriaTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ventas-tab" data-bs-toggle="tab" 
+                        data-bs-target="#ventas" type="button" role="tab">
+                    <i class="fas fa-shopping-cart me-2"></i>Auditoría de Ventas
+                    <span class="badge bg-primary ms-2">{{ auditoria_ventas|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="vehiculos-tab" data-bs-toggle="tab" 
+                        data-bs-target="#vehiculos" type="button" role="tab">
+                    <i class="fas fa-car me-2"></i>Auditoría de Vehículos
+                    <span class="badge bg-warning ms-2">{{ auditoria_vehiculos|length }}</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="errores-tab" data-bs-toggle="tab" 
+                        data-bs-target="#errores" type="button" role="tab">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Errores del Sistema
+                    <span class="badge bg-danger ms-2">{{ errores_sistema|length }}</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de pestañas -->
+        <div class="tab-content border border-top-0 p-3" id="auditoriaContent">
+            <!-- Pestaña Ventas -->
+            <div class="tab-pane fade show active" id="ventas" role="tabpanel">
+                {% if auditoria_ventas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Acción</th>
+                                    <th>ID Venta</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for audit in auditoria_ventas %}
+                                <tr>
+                                    <td><small>{{ audit.audit_id }}</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if audit.accion == 'INSERT' else 'warning' if audit.accion == 'UPDATE' else 'danger' }}">
+                                            {{ audit.accion }}
+                                        </span>
+                                    </td>
+                                    <td><code>{{ audit.venta_id or 'N/A' }}</code></td>
+                                    <td><small>{{ audit.usuario }}</small></td>
+                                    <td><small>{{ audit.fecha_evento }}</small></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                onclick="mostrarDetallesAuditoria('{{ audit.datos_anteriores|default('')|replace("'", "&#39;") }}', '{{ audit.datos_nuevos|default('')|replace("'", "&#39;") }}')">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hay registros de auditoría de ventas</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pestaña Vehículos -->
+            <div class="tab-pane fade" id="vehiculos" role="tabpanel">
+                {% if auditoria_vehiculos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Acción</th>
+                                    <th>ID Vehículo</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for audit in auditoria_vehiculos %}
+                                <tr>
+                                    <td><small>{{ audit.audit_id }}</small></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if audit.accion == 'INSERT' else 'warning' if audit.accion == 'UPDATE' else 'danger' }}">
+                                            {{ audit.accion }}
+                                        </span>
+                                    </td>
+                                    <td><code>{{ audit.vehiculo_id or 'N/A' }}</code></td>
+                                    <td><small>{{ audit.usuario }}</small></td>
+                                    <td><small>{{ audit.fecha_evento }}</small></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                onclick="mostrarDetallesAuditoria('{{ audit.datos_anteriores|default('')|replace("'", "&#39;") }}', '{{ audit.datos_nuevos|default('')|replace("'", "&#39;") }}')">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hay registros de auditoría de vehículos</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pestaña Errores -->
+            <div class="tab-pane fade" id="errores" role="tabpanel">
+                {% if errores_sistema %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Procedimiento</th>
+                                    <th>Error #</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha</th>
+                                    <th>Mensaje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for error in errores_sistema %}
+                                <tr class="{{ 'table-danger' if error.numero_error >= 50000 else 'table-warning' }}">
+                                    <td><small>{{ error.error_id }}</small></td>
+                                    <td><code>{{ error.procedimiento }}</code></td>
+                                    <td><span class="badge bg-secondary">{{ error.numero_error }}</span></td>
+                                    <td><small>{{ error.usuario }}</small></td>
+                                    <td><small>{{ error.fecha_error }}</small></td>
+                                    <td>
+                                        <small class="text-danger">{{ error.mensaje_error[:80] }}...</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">¡Excelente! No hay errores registrados</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles -->
+<div class="modal fade" id="detallesAuditoriaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>Detalles de Auditoría
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="border-bottom pb-2">
+                            <i class="fas fa-history me-2"></i>Datos Anteriores
+                        </h6>
+                        <div id="datosAnteriores" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Datos dinámicos -->
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="border-bottom pb-2">
+                            <i class="fas fa-sync-alt me-2"></i>Datos Nuevos
+                        </h6>
+                        <div id="datosNuevos" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Datos dinámicos -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal limpiar auditoría -->
+<div class="modal fade" id="limpiarAuditoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Limpiar Auditoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea limpiar los registros de auditoría?</p>
+                <div class="mb-3">
+                    <label class="form-label">Eliminar registros mayores a:</label>
+                    <select id="diasLimpiar" class="form-select">
+                        <option value="30">30 días</option>
+                        <option value="90" selected>90 días</option>
+                        <option value="180">180 días</option>
+                        <option value="365">1 año</option>
+                    </select>
+                </div>
+                <div class="alert alert-danger">
+                    <i class="fas fa-warning me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmarLimpiarAuditoria()">
+                    <i class="fas fa-broom me-1"></i>Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function mostrarDetallesAuditoria(anteriores, nuevos) {
+    const divAnteriores = document.getElementById('datosAnteriores');
+    const divNuevos = document.getElementById('datosNuevos');
+    
+    if (anteriores && anteriores.trim()) {
+        divAnteriores.innerHTML = `<pre class="mb-0">${anteriores}</pre>`;
+    } else {
+        divAnteriores.innerHTML = '<p class="text-muted mb-0"><em>No hay datos anteriores</em></p>';
+    }
+    
+    if (nuevos && nuevos.trim()) {
+        divNuevos.innerHTML = `<pre class="mb-0">${nuevos}</pre>`;
+    } else {
+        divNuevos.innerHTML = '<p class="text-muted mb-0"><em>No hay datos nuevos</em></p>';
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('detallesAuditoriaModal'));
+    modal.show();
+}
+
+function limpiarAuditoria() {
+    const modal = new bootstrap.Modal(document.getElementById('limpiarAuditoriaModal'));
+    modal.show();
+}
+
+async function confirmarLimpiarAuditoria() {
+    const dias = document.getElementById('diasLimpiar').value;
+    
+    try {
+        const response = await apiCall('/admin/api/limpiar-auditoria', { dias: parseInt(dias) });
+        
+        if (response.success) {
+            showNotification('✅ ' + response.message, 'success');
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('limpiarAuditoriaModal'));
+            modal.hide();
+            
+            // Recargar página después de 2 segundos
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            showNotification('❌ ' + response.message, 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Error al limpiar auditoría', 'error');
+    }
+}
+</script>
+{% endblock %}

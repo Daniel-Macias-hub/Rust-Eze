@@ -1,91 +1,117 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Cliente - Rust-Eze{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('client.dashboard') }}">
-                <i class="fas fa-car"></i> Rust-Eze
-            </a>
-            <span class="navbar-text slogan">Calidad, antes que cantidad</span>
-            
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">
-                    <i class="fas fa-user me-1"></i> {{ session.user_name }}
-                </span>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </a>
-            </div>
-        </div>
-    </nav>
+{% extends "layouts/admin_base.html" %}
 
-    <!-- Mensajes Flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-3">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+{% block title %}Dashboard - Admin{% endblock %}
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar Cliente -->
-            <nav class="col-md-3 col-lg-2 sidebar d-md-block">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'client.dashboard' %}active{% endif %}" 
-                               href="{{ url_for('client.dashboard') }}">
-                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'client.catalogo' %}active{% endif %}" 
-                               href="{{ url_for('client.catalogo') }}">
-                                <i class="fas fa-car me-2"></i>Catálogo
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'client.historial_compras' %}active{% endif %}" 
-                               href="{{ url_for('client.historial_compras') }}">
-                                <i class="fas fa-history me-2"></i>Mis Compras
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'client.perfil' %}active{% endif %}" 
-                               href="{{ url_for('client.perfil') }}">
-                                <i class="fas fa-user me-2"></i>Mi Perfil
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                {% block client_content %}{% endblock %}
-            </main>
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard Administrativo</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <span class="badge bg-primary fs-6">{{ stats.total_vehiculos or 0 }} vehículos</span>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card primary">
+            <div class="card-body">
+                <h2 class="display-6">{{ stats.total_vehiculos or 0 }}</h2>
+                <p class="mb-0">Vehículos Totales</p>
+                <small>{{ stats.vehiculos_disponibles or 0 }} disponibles</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <h2 class="display-6">{{ stats.ventas_mes or 0 }}</h2>
+                <p class="mb-0">Ventas del Mes</p>
+                <small>Activas y completadas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h2 class="display-6">{{ stats.total_clientes or 0 }}</h2>
+                <p class="mb-0">Clientes Activos</p>
+                <small>Registrados en el sistema</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <h2 class="display-6">{{ (stats.ventas_mes or 0) * 450000 }}</h2>
+                <p class="mb-0">Ingresos Mensuales</p>
+                <small>Aproximado</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('admin.vehiculos') }}" class="btn btn-outline-primary w-100 h-100 py-3">
+                            <i class="fas fa-car fa-2x mb-2"></i><br>
+                            Gestionar Vehículos
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('admin.ventas') }}" class="btn btn-outline-success w-100 h-100 py-3">
+                            <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
+                            Registrar Venta
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('admin.clientes') }}" class="btn btn-outline-info w-100 h-100 py-3">
+                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                            Ver Clientes
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{{ url_for('admin.reportes') }}" class="btn btn-outline-warning w-100 h-100 py-3">
+                            <i class="fas fa-chart-bar fa-2x mb-2"></i><br>
+                            Ver Reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Actividad Reciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">Hoy</small>
+                        </div>
+                        <p class="mb-1">Sistema iniciado correctamente</p>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">Siempre</small>
+                        </div>
+                        <p class="mb-1">Bienvenido al panel de administración de Rust-Eze</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

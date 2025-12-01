@@ -1,0 +1,191 @@
+{% extends "layouts/client_base.html" %}
+
+{% block title %}Dashboard - Cliente{% endblock %}
+
+{% block client_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Mi Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('client.catalogo') }}" class="btn btn-primary">
+            <i class="fas fa-car me-2"></i>Ver Catálogo
+        </a>
+    </div>
+</div>
+
+<!-- Bienvenida -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3 class="card-title">¡Bienvenido, {{ session.user_name }}!</h3>
+                        <p class="card-text">En Rust-Eze encontrará la mejor selección de vehículos con calidad garantizada.</p>
+                        <p class="card-text"><strong>"Calidad, antes que cantidad"</strong></p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-car fa-5x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Mis Compras Recientes -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Mis Compras Recientes</h5>
+            </div>
+            <div class="card-body">
+                {% if compras %}
+                    <div class="list-group list-group-flush">
+                        {% for compra in compras[:3] %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ compra.marca }} {{ compra.modelo }}</h6>
+                                <small class="text-muted">{{ compra.fecha_venta[:10] }}</small>
+                            </div>
+                            <p class="mb-1">${{ "{:,.2f}".format(compra.total_venta) }} - {{ compra.estado_venta }}</p>
+                            <small class="text-muted">Método: {{ compra.metodo_pago }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if compras|length > 3 %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('client.historial_compras') }}" class="btn btn-outline-primary btn-sm">
+                            Ver todas las compras
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aún no tienes compras registradas</p>
+                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-primary">
+                            Explorar Catálogo
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehículos Destacados -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-star me-2"></i>Vehículos Destacados</h5>
+            </div>
+            <div class="card-body">
+                {% if vehiculos %}
+                    <div class="row">
+                        {% for vehiculo in vehiculos %}
+                        <div class="col-12 mb-3">
+                            <div class="card vehicle-card">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        {% if vehiculo.imagen_url %}
+                                        <img src="{{ vehiculo.imagen_url }}" class="img-fluid rounded-start vehicle-img" 
+                                             alt="{{ vehiculo.marca }} {{ vehiculo.modelo }}">
+                                        {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                            <i class="fas fa-car fa-2x text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ vehiculo.marca }} {{ vehiculo.modelo }}</h6>
+                                            <p class="card-text">
+                                                <small class="text-muted">{{ vehiculo.anio }} • {{ vehiculo.color }} • {{ vehiculo.tipo }}</small>
+                                            </p>
+                                            <p class="card-text price-tag mb-2">${{ "{:,.2f}".format(vehiculo.precio) }}</p>
+                                            <button class="btn btn-primary btn-sm" 
+                                                    onclick="solicitarInfo({{ vehiculo.vehiculo_id }})">
+                                                <i class="fas fa-info-circle me-1"></i>Más Info
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-outline-primary">
+                            Ver Catálogo Completo
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hay vehículos disponibles en este momento</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-outline-primary w-100 h-100 py-3">
+                            <i class="fas fa-car fa-2x mb-2"></i><br>
+                            Explorar Catálogo
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('client.historial_compras') }}" class="btn btn-outline-success w-100 h-100 py-3">
+                            <i class="fas fa-history fa-2x mb-2"></i><br>
+                            Mis Compras
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('client.perfil') }}" class="btn btn-outline-info w-100 h-100 py-3">
+                            <i class="fas fa-user fa-2x mb-2"></i><br>
+                            Mi Perfil
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-outline-warning w-100 h-100 py-3" onclick="contactarAsesor()">
+                            <i class="fas fa-headset fa-2x mb-2"></i><br>
+                            Contactar Asesor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function solicitarInfo(vehiculoId) {
+    showNotification('📞 Solicitando información del vehículo...', 'info');
+    // Simular solicitud
+    setTimeout(() => {
+        showNotification('✅ Un asesor se contactará con usted pronto', 'success');
+    }, 1500);
+}
+
+function contactarAsesor() {
+    showNotification('📞 Conectando con un asesor...', 'info');
+    // Simular conexión
+    setTimeout(() => {
+        showNotification('✅ Un asesor estará con usted en breve', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

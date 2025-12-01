@@ -70,12 +70,23 @@
 
 {% block extra_js %}
 <script>
+/* eslint-disable no-unused-vars */
+// @ts-ignore
 function verHistorial(clienteId) {
-    showNotification('📊 Funcionalidad de historial en desarrollo', 'info');
+    if (typeof showNotification === 'function') {
+        showNotification('📊 Funcionalidad de historial en desarrollo', 'info');
+    } else {
+        alert('Funcionalidad de historial en desarrollo');
+    }
 }
 
+// @ts-ignore
 function editarCliente(clienteId) {
-    showNotification('✏️ Funcionalidad de edición en desarrollo', 'info');
+    if (typeof showNotification === 'function') {
+        showNotification('✏️ Funcionalidad de edición en desarrollo', 'info');
+    } else {
+        alert('Funcionalidad de edición en desarrollo');
+    }
 }
 </script>
 {% endblock %}

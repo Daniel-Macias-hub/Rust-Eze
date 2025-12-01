@@ -1,7 +1,7 @@
 // JavaScript para funcionalidades generales de Rust-Eze
 
-// API Call function
-async function apiCall(url, data, method = 'POST') {
+// API Call function - Exportada globalmente
+window.apiCall = async function apiCall(url, data, method = 'POST') {
     try {
         const response = await fetch(url, {
             method: method,
@@ -23,10 +23,10 @@ async function apiCall(url, data, method = 'POST') {
             message: 'Error de conexión con el servidor' 
         };
     }
-}
+};
 
-// Mostrar notificación
-function showNotification(message, type = 'info') {
+// Mostrar notificación - Exportada globalmente
+window.showNotification = function showNotification(message, type = 'info') {
     // Crear contenedor de notificaciones si no existe
     let container = document.getElementById('notifications-container');
     if (!container) {
@@ -72,22 +72,25 @@ function showNotification(message, type = 'info') {
             notification.remove();
         }
     }, 5000);
-}
+};
 
-// Confirmación para acciones críticas
-function confirmAction(message, callback) {
+// Confirmación para acciones críticas - Exportada globalmente
+window.confirmAction = function confirmAction(message, callback) {
     if (confirm(message)) {
         callback();
     }
-}
+};
 
-// Formatear moneda
-function formatCurrency(amount) {
+// Formatear moneda - Exportada globalmente
+window.formatCurrency = function formatCurrency(amount) {
     return new Intl.NumberFormat('es-MX', {
         style: 'currency',
         currency: 'MXN'
     }).format(amount);
-}
+};
+
+// Declaraciones globales para TypeScript/ESLint
+/* global apiCall, showNotification, confirmAction, formatCurrency */
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
@@ -129,11 +132,23 @@ document.addEventListener('DOMContentLoaded', function() {
 // Manejo de errores global
 window.addEventListener('error', function(e) {
     console.error('Error global:', e.error);
-    showNotification('Ocurrió un error inesperado', 'error');
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('Ocurrió un error inesperado', 'error');
+    }
 });
 
-// Exportar funciones para uso global
-window.apiCall = apiCall;
-window.showNotification = showNotification;
-window.confirmAction = confirmAction;
-window.formatCurrency = formatCurrency;
+// Exportar funciones explícitamente
+window.apiCall = window.apiCall;
+window.showNotification = window.showNotification;
+window.confirmAction = window.confirmAction;
+window.formatCurrency = window.formatCurrency;
+
+// Para compatibilidad con módulos
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        apiCall: window.apiCall,
+        showNotification: window.showNotification,
+        confirmAction: window.confirmAction,
+        formatCurrency: window.formatCurrency
+    };
+}
