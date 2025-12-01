@@ -1,0 +1,161 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Reportes - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Reportes y Estadísticas</h1>
+</div>
+
+<!-- Estadísticas de Ventas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Ventas por Mes</h5>
+            </div>
+            <div class="card-body">
+                {% if ventas_mes %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Total Ventas</th>
+                                <th>Ingreso Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venta in ventas_mes %}
+                            <tr>
+                                <td>{{ venta.mes }}</td>
+                                <td>{{ venta.total_ventas }}</td>
+                                <td>${{ "{:,.2f}".format(venta.ingreso_total or 0) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No hay datos de ventas disponibles.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-trophy me-2"></i>Marcas Más Vendidas</h5>
+            </div>
+            <div class="card-body">
+                {% if marcas_vendidas %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Unidades</th>
+                                <th>Ingreso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for marca in marcas_vendidas %}
+                            <tr>
+                                <td>{{ marca.marca }}</td>
+                                <td>{{ marca.unidades_vendidas }}</td>
+                                <td>${{ "{:,.2f}".format(marca.ingreso_total or 0) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No hay datos de marcas disponibles.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reportes Avanzados -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Reportes Disponibles</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                                <h5>Inventario</h5>
+                                <p class="text-muted">Reporte de vehículos por estado y tipo</p>
+                                <button class="btn btn-outline-primary" onclick="generarReporteInventario()">
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
+                                <h5>Ventas</h5>
+                                <p class="text-muted">Reporte detallado de ventas por período</p>
+                                <button class="btn btn-outline-success" onclick="generarReporteVentas()">
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-users fa-3x text-info mb-3"></i>
+                                <h5>Clientes</h5>
+                                <p class="text-muted">Reporte de clientes y su historial</p>
+                                <button class="btn btn-outline-info" onclick="generarReporteClientes()">
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function generarReporteInventario() {
+    showNotification('📊 Generando reporte de inventario...', 'info');
+    // Simular generación de reporte
+    setTimeout(() => {
+        showNotification('✅ Reporte de inventario generado exitosamente', 'success');
+    }, 2000);
+}
+
+function generarReporteVentas() {
+    showNotification('📊 Generando reporte de ventas...', 'info');
+    // Simular generación de reporte
+    setTimeout(() => {
+        showNotification('✅ Reporte de ventas generado exitosamente', 'success');
+    }, 2000);
+}
+
+function generarReporteClientes() {
+    showNotification('📊 Generando reporte de clientes...', 'info');
+    // Simular generación de reporte
+    setTimeout(() => {
+        showNotification('✅ Reporte de clientes generado exitosamente', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

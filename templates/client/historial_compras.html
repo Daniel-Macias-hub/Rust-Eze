@@ -1,0 +1,97 @@
+{% extends "layouts/client_base.html" %}
+
+{% block title %}Historial de Compras - Cliente{% endblock %}
+
+{% block client_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Mi Historial de Compras</h1>
+</div>
+
+<!-- Historial de Compras -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Todas mis Compras</h5>
+    </div>
+    <div class="card-body">
+        {% if compras %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Vehículo</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Método Pago</th>
+                        <th>Estado</th>
+                        <th>Asesor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for compra in compras %}
+                    <tr>
+                        <td><strong>#{{ compra.venta_id }}</strong></td>
+                        <td>
+                            <strong>{{ compra.marca }} {{ compra.modelo }}</strong><br>
+                            <small class="text-muted">{{ compra.anio }} • {{ compra.color }}</small>
+                        </td>
+                        <td>{{ compra.fecha_venta[:16] }}</td>
+                        <td><span class="price-tag">${{ "{:,.2f}".format(compra.total_venta) }}</span></td>
+                        <td><span class="badge bg-secondary">{{ compra.metodo_pago }}</span></td>
+                        <td>
+                            <span class="badge 
+                                {% if compra.estado_venta == 'Activa' %}bg-success
+                                {% elif compra.estado_venta == 'Cancelada' %}bg-danger
+                                {% else %}bg-warning{% endif %}">
+                                {{ compra.estado_venta }}
+                            </span>
+                        </td>
+                        <td>{{ compra.asesor or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">No tienes compras registradas</h5>
+            <p class="text-muted">Cuando realices una compra, aparecerá en este historial.</p>
+            <a href="{{ url_for('client.catalogo') }}" class="btn btn-primary">
+                <i class="fas fa-car me-2"></i>Explorar Catálogo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Estadísticas -->
+{% if compras %}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">{{ compras|length }}</h3>
+                <p class="text-muted mb-0">Total de Compras</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">${{ "{:,.2f}".format(compras|sum(attribute='total_venta')) }}</h3>
+                <p class="text-muted mb-0">Total Gastado</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info">{{ compras|selectattr('estado_venta', 'equalto', 'Activa')|list|length }}</h3>
+                <p class="text-muted mb-0">Compras Activas</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

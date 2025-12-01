@@ -1,0 +1,98 @@
+<script>
+// Función para hacer llamadas API (FALTABA ESTA DEFINICIÓN)
+async function apiCall(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error en apiCall:', error);
+        throw error;
+    }
+}
+
+// Función para mostrar notificaciones (FALTABA ESTA DEFINICIÓN)
+function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-eliminar después de 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Función para agregar vehículo
+async function agregarVehiculo() {
+    const form = document.getElementById('formAgregarVehiculo');
+    const formData = new FormData(form);
+    
+    // Convertir FormData a objeto simple
+    const data = {};
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    // Validación básica
+    if (!data.marca || !data.modelo || !data.precio) {
+        alert('Por favor complete todos los campos requeridos.');
+        return;
+    }
+    
+    try {
+        const result = await apiCall('/admin/api/agregar-vehiculo', data);
+        
+        if (result.success) {
+            showNotification('✅ ' + result.message, 'success');
+            
+            // Cerrar modal usando Bootstrap JavaScript
+            const modalElement = document.getElementById('agregarVehiculoModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            
+            form.reset();
+            
+            // Recargar la página después de 1 segundo
+            setTimeout(function() {
+                location.reload();
+            }, 1000);
+        } else {
+            showNotification('❌ ' + result.message, 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Error de conexión', 'error');
+    }
+}
+
+// Función para editar vehículo
+function editarVehiculo(id) {
+    showNotification('✏️ Funcionalidad de edición en desarrollo', 'info');
+}
+
+// Función para ver detalles
+function verDetalles(id) {
+    showNotification('👁️ Funcionalidad de detalles en desarrollo', 'info');
+}
+
+// Función para eliminar vehículo
+function eliminarVehiculo(id) {
+    if (confirm('¿Estás seguro de que quieres eliminar este vehículo? Esta acción no se puede deshacer.')) {
+        showNotification('🗑️ Funcionalidad de eliminación en desarrollo', 'info');
+    }
+}
+</script>

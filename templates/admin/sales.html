@@ -1,0 +1,160 @@
+<script>
+// Función para hacer llamadas API (FALTABA ESTA DEFINICIÓN)
+async function apiCall(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error en apiCall:', error);
+        throw error;
+    }
+}
+
+// Función para mostrar notificaciones (FALTABA ESTA DEFINICIÓN)
+function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-eliminar después de 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Función para cargar clientes
+async function cargarClientes() {
+    try {
+        const selectCliente = document.getElementById('selectCliente');
+        selectCliente.innerHTML = '<option value="">Seleccionar cliente...</option>';
+        
+        // Datos de prueba - en producción esto vendría de la API
+        const clientes = [
+            { cliente_id: 1, nombre_completo: 'Cliente Demo' }
+        ];
+        
+        clientes.forEach(function(cliente) {
+            const option = document.createElement('option');
+            option.value = cliente.cliente_id;
+            option.textContent = cliente.nombre_completo;
+            selectCliente.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error cargando clientes:', error);
+    }
+}
+
+// Función para cargar vehículos disponibles
+async function cargarVehiculosDisponibles() {
+    try {
+        const selectVehiculo = document.getElementById('selectVehiculo');
+        selectVehiculo.innerHTML = '<option value="">Seleccionar vehículo...</option>';
+        
+        // Datos de prueba - en producción esto vendría de la API
+        const vehiculos = [
+            { vehiculo_id: 1, marca: 'Toyota', modelo: 'Corolla', precio: 450000.00 },
+            { vehiculo_id: 2, marca: 'Honda', modelo: 'CR-V', precio: 620000.00 },
+            { vehiculo_id: 3, marca: 'Ford', modelo: 'Mustang', precio: 1100000.00 }
+        ];
+        
+        vehiculos.forEach(function(vehiculo) {
+            const option = document.createElement('option');
+            option.value = vehiculo.vehiculo_id;
+            option.textContent = vehiculo.marca + ' ' + vehiculo.modelo + ' - $' + vehiculo.precio.toLocaleString();
+            option.setAttribute('data-precio', vehiculo.precio);
+            selectVehiculo.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error cargando vehículos:', error);
+    }
+}
+
+// Actualizar precio cuando se selecciona un vehículo
+document.getElementById('selectVehiculo').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const precio = selectedOption.getAttribute('data-precio');
+    document.getElementById('precioVehiculo').value = precio ? '$' + parseFloat(precio).toLocaleString() : '';
+});
+
+// Función para registrar venta
+async function registrarVenta() {
+    const form = document.getElementById('formRegistrarVenta');
+    const formData = new FormData(form);
+    
+    // Convertir FormData a objeto simple
+    const data = {};
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    // Validación
+    if (!data.cliente_id || !data.vehiculo_id || !data.metodo_pago) {
+        showNotification('❌ Por favor complete todos los campos requeridos.', 'error');
+        return;
+    }
+    
+    try {
+        const result = await apiCall('/admin/api/registrar-venta', data);
+        
+        if (result.success) {
+            showNotification('✅ ' + result.message, 'success');
+            
+            // Cerrar modal usando Bootstrap JavaScript
+            const modalElement = document.getElementById('registrarVentaModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            
+            form.reset();
+            
+            setTimeout(function() { 
+                location.reload(); 
+            }, 1500);
+        } else {
+            showNotification('❌ ' + result.message, 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Error de conexión al registrar venta', 'error');
+    }
+}
+
+// Función para cancelar venta
+async function cancelarVenta(ventaId) {
+    if (confirm('¿Estás seguro de que quieres cancelar esta venta? El vehículo volverá a estar disponible.')) {
+        try {
+            const result = await apiCall('/admin/api/cancelar-venta', { venta_id: ventaId });
+            
+            if (result.success) {
+                showNotification('✅ ' + result.message, 'success');
+                setTimeout(function() { 
+                    location.reload(); 
+                }, 1000);
+            } else {
+                showNotification('❌ ' + result.message, 'error');
+            }
+        } catch (error) {
+            showNotification('❌ Error de conexión al cancelar venta', 'error');
+        }
+    }
+}
+
+// Cargar clientes y vehículos cuando se abre el modal
+document.getElementById('registrarVentaModal').addEventListener('show.bs.modal', async function() {
+    await cargarClientes();
+    await cargarVehiculosDisponibles();
+});
+</script>
