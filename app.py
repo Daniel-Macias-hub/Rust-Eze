@@ -1,6 +1,6 @@
 from flask import Flask, render_template, session, redirect, url_for, flash
 from config import Config
-from utils.database_sqlserver import init_app as init_database, execute_query
+from utils.database import init_app as init_database, execute_query
 from auth.routes import auth_bp
 from admin.routes import admin_bp
 from client.routes import client_bp

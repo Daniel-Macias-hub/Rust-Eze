@@ -77,6 +77,8 @@
     </div>
 </div>
 
+
+
 <!-- Modal para registrar venta -->
 <div class="modal fade" id="registrarVentaModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -140,6 +142,34 @@
                 </button>
                 <button type="button" class="btn btn-primary" onclick="registrarVenta()" id="btnRegistrarVenta">
                     <i class="fas fa-check me-2"></i>Registrar Venta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar cancelación -->
+<div class="modal fade" id="confirmarCancelacionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Cancelación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres cancelar esta venta? El vehículo volverá a estar disponible.</p>
+                <div class="alert alert-warning">
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer fácilmente.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>No, mantener venta
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarCancelacion">
+                    <i class="fas fa-trash-alt me-1"></i>Sí, cancelar venta
                 </button>
             </div>
         </div>
@@ -278,10 +308,17 @@ async function registrarVenta() {
     }
 }
 
-// Función para cancelar venta
+// Función para mostrar modal de confirmación de cancelación
 // @ts-ignore
-async function cancelarVenta(ventaId) {
-    if (confirm('¿Estás seguro de que quieres cancelar esta venta? El vehículo volverá a estar disponible.')) {
+function cancelarVenta(ventaId) {
+    const modalElement = document.getElementById('confirmarCancelacionModal');
+    if (!modalElement) return;
+
+    const modal = new bootstrap.Modal(modalElement);
+    const btnConfirmar = document.getElementById('btnConfirmarCancelacion');
+
+    // Usamos .onclick para asegurarnos de que solo haya un listener a la vez
+    btnConfirmar.onclick = async () => {
         try {
             let result;
             if (typeof apiCall === 'function') {
@@ -290,15 +327,15 @@ async function cancelarVenta(ventaId) {
                 result = { success: true, message: 'Venta cancelada (simulada)' };
             }
             
+            modal.hide();
+
             if (result.success) {
                 if (typeof showNotification === 'function') {
                     showNotification('✅ ' + result.message, 'success');
                 } else {
                     alert('✅ ' + result.message);
                 }
-                setTimeout(function() { 
-                    location.reload(); 
-                }, 1000);
+                setTimeout(() => location.reload(), 1500);
             } else {
                 if (typeof showNotification === 'function') {
                     showNotification('❌ ' + result.message, 'error');
@@ -307,13 +344,16 @@ async function cancelarVenta(ventaId) {
                 }
             }
         } catch (error) {
+            modal.hide();
             if (typeof showNotification === 'function') {
                 showNotification('❌ Error de conexión al cancelar venta', 'error');
             } else {
                 alert('❌ Error de conexión al cancelar venta');
             }
         }
-    }
+    };
+
+    modal.show();
 }
 
 // Cargar clientes y vehículos cuando se abre el modal

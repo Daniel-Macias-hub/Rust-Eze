@@ -1,0 +1,64 @@
+{% extends "layouts/client_base.html" %}
+
+{% block title %}Comprar Vehículo{% endblock %}
+
+{% block client_content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-shopping-cart"></i> Confirmar Compra</h4>
+                </div>
+                <div class="card-body">
+                    <h5>{{ vehiculo.marca }} {{ vehiculo.modelo }}</h5>
+                    <p><strong>Año:</strong> {{ vehiculo.anio }}</p>
+                    <p><strong>Color:</strong> {{ vehiculo.color }}</p>
+                    <p><strong>Tipo:</strong> {{ vehiculo.tipo }}</p>
+                    <p><strong>Precio:</strong> <span class="price-tag">${{ "{:,.2f}".format(vehiculo.precio) }}</span></p>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Método de Pago</label>
+                            <select class="form-select" name="metodo_pago" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta Crédito/Débito</option>
+                                <option value="Transferencia">Transferencia Bancaria</option>
+                                <option value="Financiamiento">Financiamiento</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Importante:</strong> Al confirmar la compra, el vehículo se marcará como "Vendido" y se generará una factura.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle"></i> Confirmar Compra
+                        </button>
+                        <a href="{{ url_for('client.catalogo') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-info-circle"></i> Resumen</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Cliente:</strong> {{ session.user_name }}</p>
+                    <p><strong>Email:</strong> {{ session.user_email }}</p>
+                    <hr>
+                    <h6>Detalles del vehículo:</h6>
+                    <p>{{ vehiculo.descripcion or 'Vehículo en excelentes condiciones.' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

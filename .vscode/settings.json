@@ -1,0 +1,23 @@
+{
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false,
+  "eslint.enable": false,
+  "files.associations": {
+    "*.js": "javascript",
+    "*.html": "html"
+  },
+  "emmet.includeLanguages": {
+    "jinja-html": "html"
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.git": true,
+    "**/.DS_Store": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  }
+}

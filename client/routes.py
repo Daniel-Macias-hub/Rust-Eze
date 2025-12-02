@@ -235,5 +235,5 @@ def historial_compras():
         
     except Exception as e:
         compras = []
-    
+
     return render_template('client/historial_compras.html', compras=compras)

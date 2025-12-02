@@ -78,4 +78,26 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
+
+<script>
+    // Declarar globalmente para que TypeScript/ESLint las reconozca
+    window.apiCall = window.apiCall || function() { 
+        console.warn('apiCall no está definida. Asegúrate de cargar main.js');
+        return Promise.reject('apiCall no disponible');
+    };
+    
+    window.showNotification = window.showNotification || function(message, type) {
+        console.log('Notificación:', message, type);
+        alert(message);
+    };
+    
+    window.confirmAction = window.confirmAction || function(message, callback) {
+        if (confirm(message)) callback();
+    };
+    
+    window.formatCurrency = window.formatCurrency || function(amount) {
+        return '$' + amount.toLocaleString('es-MX');
+    };
+</script>
+
 </html>

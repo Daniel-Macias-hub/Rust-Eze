@@ -1,171 +1,239 @@
-import sqlite3
-from flask import g
-import os
+"""
+Conexión unificada a SQL Server 2022 Express - VERSIÓN CORREGIDA
+Elimina todas las referencias a SQLite
+"""
 
-# Elimina todas las importaciones problemáticas y usa esto:
+import pyodbc
+from flask import g, current_app
+import logging
+from contextlib import contextmanager
+import hashlib
 
-def get_db_connection():
-    """Conexión SQLite para desarrollo"""
-    conn = sqlite3.connect('rusteze.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+logger = logging.getLogger(__name__)
 
-def execute_query(query, params=None):
-    """Ejecutar consultas SQL"""
-    conn = get_db_connection()
+class SQLServerConnection:
+    """Manejador de conexión unificado a SQL Server Express"""
+    
+    @staticmethod
+    def get_connection():
+        """Obtener conexión desde el contexto de Flask"""
+        if 'sqlserver_conn' not in g:
+            try:
+                # Usar conexión a SQLEXPRESS (instancia local)
+                connection_string = (
+                    'DRIVER={ODBC Driver 17 for SQL Server};'
+                    'SERVER=localhost\\SQLEXPRESS;'
+                    'DATABASE=RustEze_Agency;'
+                    'Trusted_Connection=yes;'
+                )
+                
+                g.sqlserver_conn = pyodbc.connect(connection_string)
+                g.sqlserver_conn.autocommit = False
+                logger.info("✅ Conexión SQL Server Express establecida")
+                
+            except pyodbc.Error as e:
+                logger.error(f"❌ Error conexión SQL Server: {e}")
+                # Fallback para desarrollo
+                raise ConnectionError(f"No se pudo conectar a SQL Server: {e}")
+                
+        return g.sqlserver_conn
+    
+    @staticmethod
+    def close_connection(e=None):
+        """Cerrar conexión al final del contexto"""
+        conn = g.pop('sqlserver_conn', None)
+        if conn is not None:
+            try:
+                conn.close()
+                logger.debug("🔌 Conexión SQL Server cerrada")
+            except:
+                pass
+
+@contextmanager
+def get_cursor():
+    """Context manager para manejo automático de cursor"""
+    conn = SQLServerConnection.get_connection()
+    cursor = conn.cursor()
     try:
-        cursor = conn.cursor()
-        if params:
-            cursor.execute(query, params)
-        else:
-            cursor.execute(query)
-        
-        # Si es SELECT, retornar resultados
-        if query.strip().upper().startswith('SELECT'):
-            columns = [column[0] for column in cursor.description]
-            results = []
-            for row in cursor.fetchall():
-                results.append(dict(zip(columns, row)))
-            return results
-        else:
-            conn.commit()
-            return {"success": True}
-            
+        yield cursor
     except Exception as e:
         conn.rollback()
         raise e
     finally:
-        conn.close()
+        cursor.close()
 
-def init_database():
-    """Inicializar la base de datos SQLite con la estructura necesaria"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
+def execute_query(query, params=None, fetch=True):
+    """
+    Ejecutar consulta SQL con manejo de errores
+    """
+    try:
+        with get_cursor() as cursor:
+            if params:
+                # Manejar listas de parámetros para IN clauses
+                if isinstance(params, (list, tuple)) and '?' in query:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+            
+            if fetch and query.strip().upper().startswith('SELECT'):
+                columns = [column[0] for column in cursor.description] if cursor.description else []
+                results = []
+                for row in cursor.fetchall():
+                    results.append(dict(zip(columns, row)))
+                return results
+            else:
+                cursor.connection.commit()
+                return {"success": True, "rows_affected": cursor.rowcount}
+                
+    except pyodbc.Error as e:
+        logger.error(f"Error en execute_query: {e}")
+        if 'cursor' in locals() and cursor.connection:
+            try:
+                cursor.connection.rollback()
+            except:
+                pass
+        
+        # Registrar error en auditoría
+        try:
+            error_query = """
+            INSERT INTO Auditoria_Errores (procedimiento, mensaje_error, numero_error, usuario)
+            VALUES (?, ?, ?, ?)
+            """
+            with get_cursor() as error_cursor:
+                error_cursor.execute(error_query, ('execute_query', str(e), 0, 'SYSTEM'))
+                error_cursor.connection.commit()
+        except:
+            pass
+            
+        raise e
+
+def call_stored_procedure(proc_name, params=None):
+    """
+    Ejecutar procedimiento almacenado con parámetros
+    """
+    try:
+        with get_cursor() as cursor:
+            if params:
+                placeholders = ', '.join(['?'] * len(params))
+                exec_stmt = f"{{CALL {proc_name} ({placeholders})}}"
+                cursor.execute(exec_stmt, params)
+            else:
+                cursor.execute(f"{{CALL {proc_name}}}")
+            
+            # Para SP que retornan resultados
+            if cursor.description:
+                columns = [column[0] for column in cursor.description]
+                results = []
+                for row in cursor.fetchall():
+                    results.append(dict(zip(columns, row)))
+                return results
+            else:
+                cursor.connection.commit()
+                return {"success": True, "rows_affected": cursor.rowcount}
+                
+    except pyodbc.Error as e:
+        logger.error(f"Error en {proc_name}: {e}")
+        
+        # Registrar error en auditoría
+        try:
+            error_query = """
+            INSERT INTO Auditoria_Errores (procedimiento, mensaje_error, numero_error, usuario)
+            VALUES (?, ?, ?, ?)
+            """
+            with get_cursor() as error_cursor:
+                error_cursor.execute(error_query, (proc_name, str(e), 0, 'SYSTEM'))
+                error_cursor.connection.commit()
+        except:
+            pass
+            
+        raise e
+
+def init_app(app):
+    """Inicializar extensión con Flask app"""
+    app.teardown_appcontext(SQLServerConnection.close_connection)
     
-    # Tabla Empleados
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Empleados (
-            empleado_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre_completo TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            puesto TEXT NOT NULL,
-            password_hash TEXT NOT NULL,
-            fecha_contratacion DATE DEFAULT CURRENT_DATE,
-            activo BOOLEAN DEFAULT 1,
-            es_administrador BOOLEAN DEFAULT 0
-        )
-    ''')
-    
-    # Tabla Clientes
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Clientes (
-            cliente_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre_completo TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            telefono TEXT,
-            direccion TEXT,
-            tipo_documento TEXT NOT NULL,
-            numero_documento TEXT NOT NULL,
-            password_hash TEXT NOT NULL,
-            fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-            activo BOOLEAN DEFAULT 1
-        )
-    ''')
-    
-    # Tabla Vehiculos
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Vehiculos (
-            vehiculo_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            marca TEXT NOT NULL,
-            modelo TEXT NOT NULL,
-            anio INTEGER NOT NULL,
-            precio DECIMAL(10,2) NOT NULL,
-            color TEXT NOT NULL,
-            tipo TEXT NOT NULL,
-            estado_disponibilidad TEXT DEFAULT 'Disponible',
-            imagen_url TEXT,
-            descripcion TEXT,
-            fecha_ingreso DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Tabla Ventas
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Ventas (
-            venta_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente_id INTEGER NOT NULL,
-            empleado_id INTEGER NOT NULL,
-            fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
-            total_venta DECIMAL(10,2) NOT NULL,
-            metodo_pago TEXT NOT NULL,
-            estado_venta TEXT DEFAULT 'Activa',
-            FOREIGN KEY (cliente_id) REFERENCES Clientes (cliente_id),
-            FOREIGN KEY (empleado_id) REFERENCES Empleados (empleado_id)
-        )
-    ''')
-    
-    # Tabla Detalle_Ventas
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Detalle_Ventas (
-            detalle_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            venta_id INTEGER NOT NULL,
-            vehiculo_id INTEGER NOT NULL,
-            precio_unitario DECIMAL(10,2) NOT NULL,
-            cantidad INTEGER DEFAULT 1,
-            FOREIGN KEY (venta_id) REFERENCES Ventas (venta_id) ON DELETE CASCADE,
-            FOREIGN KEY (vehiculo_id) REFERENCES Vehiculos (vehiculo_id)
-        )
-    ''')
-    
-    # Insertar datos de prueba
-    cursor.execute('''
-        INSERT OR IGNORE INTO Empleados (nombre_completo, email, puesto, password_hash, es_administrador)
-        VALUES 
-        ('Administrador Principal', 'admin@rusteze.com', 'Gerente', 'admin123', 1),
-        ('Vendedor Ejemplo', 'vendedor@rusteze.com', 'Vendedor', 'user123', 0)
-    ''')
-    
-    cursor.execute('''
-        INSERT OR IGNORE INTO Clientes (nombre_completo, email, telefono, tipo_documento, numero_documento, password_hash)
-        VALUES 
-        ('Cliente Demo', 'cliente@ejemplo.com', '555-1234', 'INE', 'ABC123456', 'cliente123')
-    ''')
-    
-    cursor.execute('''
-        INSERT OR IGNORE INTO Vehiculos (marca, modelo, anio, precio, color, tipo, descripcion, imagen_url)
-        VALUES 
-        ('Toyota', 'Corolla', 2024, 450000.00, 'Blanco', 'Sedan', 'Automóvil familiar confiable', '/static/images/vehicles/corolla.jpg'),
-        ('Honda', 'CR-V', 2023, 620000.00, 'Plata', 'SUV', 'SUV espaciosa para la familia', '/static/images/vehicles/crv.jpg'),
-        ('Ford', 'Mustang', 2023, 1100000.00, 'Rojo', 'Deportivo', 'Leyenda americana con potencia', '/static/images/vehicles/mustang.jpg')
-    ''')
-    
-    conn.commit()
-    conn.close()
+    # Verificar conexión al inicio
+    with app.app_context():
+        try:
+            test = execute_query("SELECT @@VERSION as version")
+            logger.info(f"✅ SQL Server inicializado: {test[0]['version'][:50]}...")
+            
+        except Exception as e:
+            logger.error(f"❌ Error inicialización SQL Server: {e}")
+            logger.warning("⚠️  Asegúrate de que:")
+            logger.warning("   1. SQL Server 2022 Express esté instalado")
+            logger.warning("   2. La base de datos 'RustEze_Agency' exista")
+            logger.warning("   3. El servicio SQL Server esté ejecutándose")
+            raise
 
 class User:
-    """Clase para manejar usuarios"""
+    """Clase para manejar usuarios con SQL Server"""
+    
+    @staticmethod
+    def hash_password(password):
+        """Hash simple para desarrollo (en producción usar bcrypt)"""
+        return hashlib.sha256(password.encode()).hexdigest()
     
     @staticmethod
     def authenticate(email, password, is_admin=False):
-        """Autenticar usuario"""
-        if is_admin:
-            query = """
-                SELECT empleado_id, nombre_completo, email, puesto, es_administrador 
-                FROM Empleados 
-                WHERE email = ? AND password_hash = ? AND activo = 1
-            """
-        else:
-            query = """
-                SELECT cliente_id, nombre_completo, email 
-                FROM Clientes 
-                WHERE email = ? AND password_hash = ? AND activo = 1
-            """
-        
+        """Autenticar usuario contra SQL Server"""
         try:
-            result = execute_query(query, (email, password))
+            hashed_password = User.hash_password(password)
+            
+            if is_admin:
+                query = """
+                    SELECT empleado_id as id, nombre_completo, email, puesto, 
+                           es_administrador, 'admin' as tipo
+                    FROM Empleados 
+                    WHERE email = ? AND password_hash = ? AND activo = 1
+                """
+            else:
+                query = """
+                    SELECT cliente_id as id, nombre_completo, email, 
+                           NULL as puesto, 0 as es_administrador, 'client' as tipo
+                    FROM Clientes 
+                    WHERE email = ? AND password_hash = ? AND activo = 1
+                """
+            
+            result = execute_query(query, (email, hashed_password))
+            
             if result:
-                return result[0]
+                user = result[0]
+                # Agregar campos adicionales para compatibilidad
+                if is_admin:
+                    user['empleado_id'] = user['id']
+                else:
+                    user['cliente_id'] = user['id']
+                return user
+            
             return None
+            
         except Exception as e:
-            print(f"Error en autenticación: {e}")
+            logger.error(f"Error en autenticación: {e}")
+            return None
+    
+    @staticmethod
+    def get_by_id(user_id, is_admin=False):
+        """Obtener usuario por ID"""
+        try:
+            if is_admin:
+                query = """
+                    SELECT empleado_id, nombre_completo, email, puesto, es_administrador
+                    FROM Empleados 
+                    WHERE empleado_id = ? AND activo = 1
+                """
+            else:
+                query = """
+                    SELECT cliente_id, nombre_completo, email, telefono, direccion
+                    FROM Clientes 
+                    WHERE cliente_id = ? AND activo = 1
+                """
+            
+            result = execute_query(query, (user_id,))
+            return result[0] if result else None
+            
+        except Exception as e:
+            logger.error(f"Error obteniendo usuario: {e}")
             return None

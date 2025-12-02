@@ -1,0 +1,86 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Registrar Nueva Venta{% endblock %}
+
+{% block admin_content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-cash-register"></i> Registrar Nueva Venta</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <select class="form-select" name="cliente_id" required>
+                                <option value="">Seleccionar cliente...</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.cliente_id }}">{{ cliente.nombre_completo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Vehículo</label>
+                            <select class="form-select" name="vehiculo_id" required id="selectVehiculo">
+                                <option value="">Seleccionar vehículo...</option>
+                                {% for vehiculo in vehiculos %}
+                                <option value="{{ vehiculo.vehiculo_id }}" data-precio="{{ vehiculo.precio }}">
+                                    {{ vehiculo.marca }} {{ vehiculo.modelo }} - ${{ "{:,.2f}".format(vehiculo.precio) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Método de Pago</label>
+                            <select class="form-select" name="metodo_pago" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Financiamiento">Financiamiento</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Precio Total</label>
+                            <input type="text" class="form-control" id="precioTotal" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    El empleado registrado será: <strong>{{ session.user_name }}</strong>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Registrar Venta
+                </button>
+                <a href="{{ url_for('admin.ventas') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Actualizar precio cuando se selecciona un vehículo
+document.getElementById('selectVehiculo').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    const precio = selected.getAttribute('data-precio');
+    document.getElementById('precioTotal').value = precio ? '$' + parseFloat(precio).toLocaleString() : '';
+});
+</script>
+{% endblock %}

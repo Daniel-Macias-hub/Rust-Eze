@@ -107,8 +107,8 @@
                                     <td><small>{{ audit.usuario }}</small></td>
                                     <td><small>{{ audit.fecha_evento }}</small></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-info" 
-                                                onclick="mostrarDetallesAuditoria('{{ audit.datos_anteriores|default('')|replace("'", "&#39;") }}', '{{ audit.datos_nuevos|default('')|replace("'", "&#39;") }}')">
+                                        <button class="btn btn-sm btn-outline-info"
+                                                onclick='mostrarDetallesAuditoria({{ audit.datos_anteriores|tojson }}, {{ audit.datos_nuevos|tojson }})'>
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </td>
@@ -154,7 +154,7 @@
                                     <td><small>{{ audit.fecha_evento }}</small></td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-info" 
-                                                onclick="mostrarDetallesAuditoria('{{ audit.datos_anteriores|default('')|replace("'", "&#39;") }}', '{{ audit.datos_nuevos|default('')|replace("'", "&#39;") }}')">
+                                                onclick='mostrarDetallesAuditoria({{ audit.datos_anteriores|tojson }}, {{ audit.datos_nuevos|tojson }})'>
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </td>

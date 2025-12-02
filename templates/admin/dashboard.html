@@ -130,6 +130,18 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Función para formatear moneda
+function formatCurrency(value) {
+    if (typeof value !== 'number') {
+        value = parseFloat(value);
+    }
+    // Asumimos USD, puedes cambiarlo a tu moneda local
+    return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: 'USD' 
+    }).format(value || 0);
+}
+
 // Cargar top marcas
 async function cargarTopMarcas() {
     try {
@@ -170,45 +182,73 @@ async function cargarTopMarcas() {
 async function inicializarGrafico() {
     try {
         const response = await fetch('/admin/api/ventas-por-mes-marca');
-        const data = await response.json();
-        
-        if (data.success) {
+        const apiData = await response.json();
+
+        if (apiData.success && apiData.data.length > 0) {
             const ctx = document.getElementById('ventasChart').getContext('2d');
+            const data = apiData.data;
+
+            // Extraer etiquetas (meses) y marcas
+            const labels = data.map(d => d.mes_nombre);
+            const marcas = Object.keys(data[0]).filter(k => k !== 'mes_nombre' && k !== 'mes_numero');
             
-            // Procesar datos para Chart.js
-            const datasets = [];
-            const meses = new Set();
-            
-            // Aquí procesarías los datos del PIVOT
-            // Por ahora un gráfico de ejemplo
+            // Paleta de colores para las marcas
+            const colors = [
+                'rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'
+            ];
+
+            const datasets = marcas.map((marca, index) => ({
+                label: marca,
+                data: data.map(d => d[marca] || 0),
+                borderColor: colors[index % colors.length],
+                backgroundColor: colors[index % colors.length].replace('1)', '0.2)'),
+                tension: 0.1,
+                fill: true
+            }));
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Ventas 2024',
-                        data: [12, 19, 3, 5, 2, 3],
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        tension: 0.1
-                    }]
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'top',
                         },
                         title: {
                             display: true,
-                            text: 'Ventas Mensuales'
+                            text: 'Ventas Mensuales por Marca'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
             });
+        } else {
+             document.getElementById('ventasChart').outerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No hay datos de ventas para mostrar en el gráfico.</p>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Error inicializando gráfico:', error);
+         document.getElementById('ventasChart').outerHTML = `
+            <div class="text-center py-5 text-danger">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                <p>Error al cargar los datos del gráfico.</p>
+                <small>${error.message}</small>
+            </div>
+        `;
     }
 }
 

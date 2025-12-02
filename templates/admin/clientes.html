@@ -73,6 +73,7 @@
 /* eslint-disable no-unused-vars */
 // @ts-ignore
 function verHistorial(clienteId) {
+    console.log(`Solicitando historial para el cliente ID: ${clienteId}`);
     if (typeof showNotification === 'function') {
         showNotification('📊 Funcionalidad de historial en desarrollo', 'info');
     } else {
@@ -82,6 +83,7 @@ function verHistorial(clienteId) {
 
 // @ts-ignore
 function editarCliente(clienteId) {
+    console.log(`Intentando editar cliente ID: ${clienteId}`);
     if (typeof showNotification === 'function') {
         showNotification('✏️ Funcionalidad de edición en desarrollo', 'info');
     } else {

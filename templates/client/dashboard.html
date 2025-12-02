@@ -104,7 +104,7 @@
                                             </p>
                                             <p class="card-text price-tag mb-2">${{ "{:,.2f}".format(vehiculo.precio) }}</p>
                                             <button class="btn btn-primary btn-sm" 
-                                                    onclick="solicitarInfo({{ vehiculo.vehiculo_id }})">
+                                                    onclick='solicitarInfo({{ vehiculo.vehiculo_id|tojson }})'>
                                                 <i class="fas fa-info-circle me-1"></i>Más Info
                                             </button>
                                         </div>

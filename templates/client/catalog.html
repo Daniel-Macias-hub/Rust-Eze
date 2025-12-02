@@ -45,6 +45,16 @@
     </div>
 </div>
 
+<!-- En cada card de vehículo, agregar este botón: -->
+<div class="card-footer bg-transparent">
+    <div class="d-grid">
+        <a href="{{ url_for('client.comprar_vehiculo', vehiculo_id=vehiculo.vehiculo_id) }}" 
+           class="btn btn-success">
+            <i class="fas fa-shopping-cart"></i> Comprar Ahora
+        </a>
+    </div>
+</div>
+
 <!-- Grid de Vehículos -->
 <div class="row" id="vehiculosGrid">
     {% if vehiculos %}

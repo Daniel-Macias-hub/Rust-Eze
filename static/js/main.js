@@ -1,7 +1,14 @@
 // JavaScript para funcionalidades generales de Rust-Eze
+// Este archivo define funciones globales para toda la aplicación
 
-// API Call function - Exportada globalmente
-window.apiCall = async function apiCall(url, data, method = 'POST') {
+/**
+ * Función para hacer llamadas API
+ * @param {string} url - URL del endpoint
+ * @param {any} data - Datos a enviar
+ * @param {string} method - Método HTTP (GET, POST, etc.)
+ * @returns {Promise<any>} Respuesta JSON
+ */
+async function apiCall(url, data, method = 'POST') {
     try {
         const response = await fetch(url, {
             method: method,
@@ -23,22 +30,20 @@ window.apiCall = async function apiCall(url, data, method = 'POST') {
             message: 'Error de conexión con el servidor' 
         };
     }
-};
+}
 
-// Mostrar notificación - Exportada globalmente
-window.showNotification = function showNotification(message, type = 'info') {
+/**
+ * Mostrar notificación en pantalla
+ * @param {string} message - Mensaje a mostrar
+ * @param {'success'|'error'|'warning'|'info'} type - Tipo de notificación
+ */
+function showNotification(message, type = 'info') {
     // Crear contenedor de notificaciones si no existe
     let container = document.getElementById('notifications-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'notifications-container';
-        container.style.cssText = `
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-        `;
+        container.style.cssText = 'position: fixed; top: 80px; right: 20px; z-index: 9999; max-width: 400px;';
         document.body.appendChild(container);
     }
 
@@ -58,7 +63,8 @@ window.showNotification = function showNotification(message, type = 'info') {
 
     const notification = document.createElement('div');
     notification.className = `alert ${alertClass} alert-dismissible fade show`;
-    notification.style.cssText = 'margin-bottom: 10px; animation: slideInRight 0.3s ease;';
+    notification.style.marginBottom = '10px';
+    notification.style.animation = 'slideInRight 0.3s ease';
     notification.innerHTML = `
         <strong>${icon}</strong> ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -72,46 +78,59 @@ window.showNotification = function showNotification(message, type = 'info') {
             notification.remove();
         }
     }, 5000);
-};
+}
 
-// Confirmación para acciones críticas - Exportada globalmente
-window.confirmAction = function confirmAction(message, callback) {
+/**
+ * Confirmación para acciones críticas
+ * @param {string} message - Mensaje de confirmación
+ * @param {Function} callback - Función a ejecutar si se confirma
+ */
+function confirmAction(message, callback) {
     if (confirm(message)) {
         callback();
     }
-};
+}
 
-// Formatear moneda - Exportada globalmente
-window.formatCurrency = function formatCurrency(amount) {
+/**
+ * Formatear moneda
+ * @param {number} amount - Cantidad a formatear
+ * @returns {string} Moneda formateada
+ */
+function formatCurrency(amount) {
     return new Intl.NumberFormat('es-MX', {
         style: 'currency',
         currency: 'MXN'
     }).format(amount);
-};
+}
 
-// Declaraciones globales para TypeScript/ESLint
-/* global apiCall, showNotification, confirmAction, formatCurrency */
+// ================================================
+// INICIALIZACIÓN
+// ================================================
 
-// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar tooltips de Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        // Usar bootstrap global
+        if (typeof bootstrap !== 'undefined') {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        }
     });
 
     // Auto-ocultar alerts después de 5 segundos
     setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        var alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
         alerts.forEach(function(alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+            if (typeof bootstrap !== 'undefined') {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
         });
     }, 5000);
 
     // Agregar estilo para animaciones de notificación
     if (!document.querySelector('#notification-styles')) {
-        const style = document.createElement('style');
+        var style = document.createElement('style');
         style.id = 'notification-styles';
         style.textContent = `
             @keyframes slideInRight {
@@ -129,26 +148,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Manejo de errores global
+// ================================================
+// MANEJO DE ERRORES GLOBAL
+// ================================================
+
 window.addEventListener('error', function(e) {
     console.error('Error global:', e.error);
-    if (typeof window.showNotification === 'function') {
-        window.showNotification('Ocurrió un error inesperado', 'error');
+    if (typeof showNotification === 'function') {
+        showNotification('Ocurrió un error inesperado', 'error');
     }
 });
 
-// Exportar funciones explícitamente
-window.apiCall = window.apiCall;
-window.showNotification = window.showNotification;
-window.confirmAction = window.confirmAction;
-window.formatCurrency = window.formatCurrency;
+// ================================================
+// HACER FUNCIONES GLOBALES
+// ================================================
 
-// Para compatibilidad con módulos
+// Hacer funciones disponibles globalmente
+window.apiCall = apiCall;
+window.showNotification = showNotification;
+window.confirmAction = confirmAction;
+window.formatCurrency = formatCurrency;
+
+// Para CommonJS (Node.js) - ignorar si no se usa
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        apiCall: window.apiCall,
-        showNotification: window.showNotification,
-        confirmAction: window.confirmAction,
-        formatCurrency: window.formatCurrency
+        apiCall: apiCall,
+        showNotification: showNotification,
+        confirmAction: confirmAction,
+        formatCurrency: formatCurrency
     };
 }

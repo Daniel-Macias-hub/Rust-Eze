@@ -3,9 +3,9 @@ Rutas del panel de administración - Rust-Eze Agency
 Conectado a SQL Server 2022 Express con procedimientos almacenados
 """
 
-from flask import Blueprint, render_template, request, jsonify, session, flash
+from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 from utils.security import admin_required
-from utils.database_sqlserver import execute_query, call_stored_procedure
+from utils.database import execute_query, call_stored_procedure
 import logging
 
 logger = logging.getLogger(__name__)
@@ -864,3 +864,16 @@ def api_vehiculos_disponibles():
     except Exception as e:
         logger.error(f'Error al obtener vehículos disponibles: {str(e)}')
         return jsonify({'success': False, 'error': str(e)}), 400
+    
+    # En admin/routes.py
+@admin_bp.route('/ventas/cancelar/<int:venta_id>', methods=['POST'])
+@admin_required
+def cancelar_venta(venta_id):
+    """Cancelar una venta existente"""
+    try:
+        result = call_stored_procedure('sp_CancelarVenta', [venta_id])
+        flash('Venta cancelada exitosamente', 'success')
+    except Exception as e:
+        flash(f'Error al cancelar venta: {str(e)}', 'danger')
+    
+    return redirect(url_for('admin.ventas'))
