@@ -1,4 +1,4 @@
-# 🚗 Rust-Eze Agency - Sistema de Gestión de Ventas de Autos
+#  Rust-Eze Agency - Sistema de Gestión de Ventas de Autos
 
 **Calidad, antes que cantidad**
 
@@ -9,15 +9,15 @@
 
 Sistema completo de gestión para agencia de venta de automóviles con backend en Flask, frontend en Bootstrap 5 y base de datos SQL Server 2022.
 
-## ✨ Características Principales
+## Características Principales
 
-### 🏗️ Arquitectura
+### Arquitectura
 - **Backend**: Flask con Blueprints organizados
 - **Frontend**: Bootstrap 5 + JavaScript vanilla
 - **Base de datos**: SQL Server 2022 Express
 - **Autenticación**: Roles separados (Admin/Cliente)
 
-### 📊 Funcionalidades Admin
+### Funcionalidades Admin
 - Dashboard con estadísticas en tiempo real
 - Gestión completa de vehículos
 - Registro y cancelación de ventas
@@ -25,14 +25,14 @@ Sistema completo de gestión para agencia de venta de automóviles con backend e
 - Sistema de auditoría automático
 - Reportes avanzados (PIVOT, CASE, RANKING)
 
-### 👤 Funcionalidades Cliente
+### Funcionalidades Cliente
 - Catálogo de vehículos con filtros
 - Historial de compras
 - Perfil personalizado
 - Solicitud de test drives
 - Contacto con asesores
 
-### 🗄️ Base de Datos Avanzada
+### Base de Datos Avanzada
 - Procedimientos almacenados optimizados
 - Triggers para auditoría automática
 - Transacciones atómicas
@@ -40,7 +40,7 @@ Sistema completo de gestión para agencia de venta de automóviles con backend e
 - Índices optimizados
 - Secuencias para IDs únicos
 
-## 🚀 Instalación Rápida
+##  Instalación Rápida
 
 ### Prerrequisitos
 - Python 3.10+
