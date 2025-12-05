@@ -1,239 +1,85 @@
-from flask import Blueprint, render_template, request, jsonify, session
-from utils.security import client_required
-from utils.database import execute_query
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from utils.database import execute_query, call_stored_procedure
 
 client_bp = Blueprint('client', __name__)
 
+
+# -------------------------------------------------------------------
+# Filtro: sólo clientes logueados
+# -------------------------------------------------------------------
+@client_bp.before_request
+def require_client_login():
+    # Si no hay sesión o es admin, mándalo al login
+    if 'user_id' not in session or session.get('es_administrador'):
+        return redirect(url_for('auth.login'))
+
+
+# -------------------------------------------------------------------
+# Dashboard de cliente
+# -------------------------------------------------------------------
 @client_bp.route('/dashboard')
-@client_required
 def dashboard():
-    """Panel de control cliente"""
     cliente_id = session.get('user_id')
-    
-    try:
-        # Obtener historial de compras del cliente
-        compras = execute_query("""
-            SELECT 
-                v.venta_id, v.fecha_venta, v.total_venta, v.metodo_pago, v.estado_venta,
-                ve.marca, ve.modelo, ve.anio, ve.color, ve.tipo
-            FROM Ventas v
-            JOIN Detalle_Ventas dv ON v.venta_id = dv.venta_id
-            JOIN Vehiculos ve ON dv.vehiculo_id = ve.vehiculo_id
-            WHERE v.cliente_id = ?
-            ORDER BY v.fecha_venta DESC
-        """, (cliente_id,))
-        
-        # Obtener vehículos disponibles (solo 4 para el dashboard)
-        vehiculos = execute_query("""
-            SELECT vehiculo_id, marca, modelo, anio, precio, color, tipo, imagen_url, descripcion
-            FROM Vehiculos 
-            WHERE estado_disponibilidad = 'Disponible'
-            ORDER BY precio DESC
-            LIMIT 4
-        """)
-        
-    except Exception as e:
-        compras = []
-        vehiculos = []
-        # En producción usar logger
-    
-    return render_template('client/dashboard.html', 
-                         compras=compras, 
-                         vehiculos=vehiculos)
 
-@client_bp.route('/catalogo')
-@client_required
-def catalogo():
-    """Catálogo completo de vehículos"""
-    try:
-        # Filtros
-        marca = request.args.get('marca')
-        tipo = request.args.get('tipo')
-        precio_min = request.args.get('precio_min')
-        precio_max = request.args.get('precio_max')
-        
-        query = """
-            SELECT vehiculo_id, marca, modelo, anio, precio, color, tipo, 
-                   imagen_url, descripcion, estado_disponibilidad
-            FROM Vehiculos 
-            WHERE estado_disponibilidad = 'Disponible'
-        """
-        
-        params = []
-        
-        if marca and marca != 'todas':
-            query += " AND marca = ?"
-            params.append(marca)
-        
-        if tipo and tipo != 'todos':
-            query += " AND tipo = ?"
-            params.append(tipo)
-        
-        if precio_min:
-            query += " AND precio >= ?"
-            params.append(float(precio_min))
-        
-        if precio_max:
-            query += " AND precio <= ?"
-            params.append(float(precio_max))
-        
-        query += " ORDER BY precio DESC"
-        
-        vehiculos = execute_query(query, params)
-        
-        # Obtener marcas únicas para filtros
-        marcas = execute_query("SELECT DISTINCT marca FROM Vehiculos WHERE estado_disponibilidad = 'Disponible'")
-        marcas = [marca['marca'] for marca in marcas]
-        
-    except Exception as e:
-        vehiculos = []
-        marcas = []
-    
-    return render_template('client/catalog.html', 
-                         vehiculos=vehiculos, 
-                         marcas=marcas)
+    # Vehículos (solo disponibles)
+    vehiculos = execute_query("""
+        SELECT
+            vehiculo_id,
+            marca,
+            modelo,
+            anio,
+            precio,
+            estado_disponibilidad
+        FROM Vehiculos
+        WHERE estado_disponibilidad = 'Disponible'
+        ORDER BY marca, modelo
+    """)
 
-@client_bp.route('/perfil')
-@client_required
-def perfil():
-    """Perfil del cliente"""
+    # Historial de compras desde el SP
+    historial = []
+    try:
+        historial = call_stored_procedure('sp_HistorialComprasCliente', (cliente_id,))
+    except Exception as e:
+        flash(f'Error al cargar historial de compras: {e}', 'danger')
+
+    return render_template(
+        'client/dashboard.html',
+        vehiculos=vehiculos,
+        historial=historial
+    )
+
+
+# -------------------------------------------------------------------
+# Comprar vehículo
+# -------------------------------------------------------------------
+@client_bp.route('/comprar/<int:vehiculo_id>', methods=['POST'])
+def comprar(vehiculo_id):
     cliente_id = session.get('user_id')
-    
-    try:
-        cliente_data = execute_query("""
-            SELECT cliente_id, nombre_completo, email, telefono, direccion, 
-                   tipo_documento, numero_documento, fecha_registro
-            FROM Clientes 
-            WHERE cliente_id = ?
-        """, (cliente_id,))
-        
-        cliente = cliente_data[0] if cliente_data else None
-        
-    except Exception as e:
-        cliente = None
-    
-    return render_template('client/profile.html', cliente=cliente)
+    # Por ahora usamos un empleado fijo (id 2) para registrar la venta
+    empleado_id = 2
+    metodo_pago = 'Tarjeta'
 
-@client_bp.route('/api/actualizar-perfil', methods=['POST'])
-@client_required
-def api_actualizar_perfil():
-    """API para actualizar perfil del cliente"""
     try:
-        data = request.get_json()
-        cliente_id = session.get('user_id')
-        
-        telefono = data.get('telefono')
-        direccion = data.get('direccion')
-        
-        execute_query("""
-            UPDATE Clientes 
-            SET telefono = ?, direccion = ? 
-            WHERE cliente_id = ?
-        """, (telefono, direccion, cliente_id))
-        
-        # Actualizar sesión si es necesario
-        session['user_telefono'] = telefono
-        
-        return jsonify({
-            'success': True,
-            'message': 'Perfil actualizado exitosamente'
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al actualizar perfil: {str(e)}'
-        }), 400
+        # Llamar al SP
+        result = call_stored_procedure(
+            'sp_RegistrarVenta',
+            (cliente_id, empleado_id, vehiculo_id, metodo_pago)
+        )
 
-@client_bp.route('/api/solicitar-test-drive', methods=['POST'])
-@client_required
-def api_solicitar_test_drive():
-    """API para solicitar test drive"""
-    try:
-        data = request.get_json()
-        vehiculo_id = data.get('vehiculo_id')
-        fecha_solicitud = data.get('fecha_solicitud')
-        cliente_id = session.get('user_id')
-        
-        # Aquí implementarías la lógica para programar test drive
-        # Por ahora solo es un placeholder
-        
-        # Obtener información del vehículo para el mensaje
-        vehiculo = execute_query("SELECT marca, modelo FROM Vehiculos WHERE vehiculo_id = ?", (vehiculo_id,))
-        
-        if vehiculo:
-            vehiculo_info = f"{vehiculo[0]['marca']} {vehiculo[0]['modelo']}"
-            mensaje = f"Solicitud de test drive para {vehiculo_info} el {fecha_solicitud} recibida. Nos contactaremos pronto."
-        else:
-            mensaje = "Solicitud de test drive recibida. Nos contactaremos pronto."
-        
-        return jsonify({
-            'success': True,
-            'message': mensaje
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al solicitar test drive: {str(e)}'
-        }), 400
+        # result debe ser una lista de dicts con columnas: resultado, venta_id, mensaje
+        mensaje_flash = None
+        if isinstance(result, list) and len(result) > 0:
+            row = result[0]
+            if row.get('resultado') == 'Éxito':
+                mensaje_flash = row.get('mensaje')
 
-@client_bp.route('/api/contactar-asesor', methods=['POST'])
-@client_required
-def api_contactar_asesor():
-    """API para contactar a un asesor"""
-    try:
-        data = request.get_json()
-        mensaje = data.get('mensaje')
-        vehiculo_id = data.get('vehiculo_id')
-        cliente_id = session.get('user_id')
-        
-        # Obtener información del cliente
-        cliente = execute_query("SELECT nombre_completo, email FROM Clientes WHERE cliente_id = ?", (cliente_id,))
-        
-        if cliente:
-            nombre_cliente = cliente[0]['nombre_completo']
-            
-            # Aquí normalmente enviarías un email o notificación al asesor
-            # Por ahora solo retornamos un mensaje de éxito
-            
-            return jsonify({
-                'success': True,
-                'message': f'Solicitud de contacto enviada. Un asesor se comunicará con {nombre_cliente} pronto.'
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': 'Error: Cliente no encontrado'
-            }), 400
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al contactar asesor: {str(e)}'
-        }), 400
+        # Si por alguna razón el SP no devolvió nada legible, consideramos que falló
+        if not mensaje_flash:
+            raise RuntimeError('El procedimiento no devolvió un resultado de éxito.')
 
-@client_bp.route('/historial-compras')
-@client_required
-def historial_compras():
-    """Historial completo de compras"""
-    cliente_id = session.get('user_id')
-    
-    try:
-        compras = execute_query("""
-            SELECT 
-                v.venta_id, v.fecha_venta, v.total_venta, v.metodo_pago, v.estado_venta,
-                ve.marca, ve.modelo, ve.anio, ve.color, ve.tipo, ve.descripcion,
-                e.nombre_completo as asesor
-            FROM Ventas v
-            JOIN Detalle_Ventas dv ON v.venta_id = dv.venta_id
-            JOIN Vehiculos ve ON dv.vehiculo_id = ve.vehiculo_id
-            JOIN Empleados e ON v.empleado_id = e.empleado_id
-            WHERE v.cliente_id = ?
-            ORDER BY v.fecha_venta DESC
-        """, (cliente_id,))
-        
-    except Exception as e:
-        compras = []
+        flash(mensaje_flash, 'success')
 
-    return render_template('client/historial_compras.html', compras=compras)
+    except Exception as e:
+        flash(f'Error al registrar la venta: {e}', 'danger')
+
+    return redirect(url_for('client.dashboard'))

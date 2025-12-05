@@ -1,179 +1,343 @@
-/* Estilos generales para Rust-Eze */
+/* ==========================
+   PALETA Y VARIABLES
+   ========================== */
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --accent-color: #e74c3c;
-    --light-color: #ecf0f1;
-    --dark-color: #2c3e50;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
+    --primary-color: #121826;
+    --secondary-color: #4f46e5;
+    --accent-color: #f97316;
+    --light-color: #f9fafb;
+    --muted-color: #9ca3af;
+    --danger-color: #ef4444;
+    --success-color: #22c55e;
+    --warning-color: #eab308;
+
+    --glass-bg: rgba(15, 23, 42, 0.78);
+    --glass-border: rgba(148, 163, 184, 0.3);
+    --glass-card-bg: rgba(15, 23, 42, 0.92);
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+/* ==========================
+   LAYOUT GENERAL + FONDO
+   ========================== */
+
+.rusteze-body {
+    min-height: 100vh;
     margin: 0;
-    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--light-color);
+    background: radial-gradient(circle at 0% 0%, #111827 0%, #020617 45%, #0b1120 100%);
+    overflow-x: hidden;
+}
+
+/* Contenedor del shader Prism (full screen, detrás de todo) */
+#prism-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    overflow: hidden;
+}
+
+/* Capa glass sobre el fondo animado */
+.rusteze-shell {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    backdrop-filter: blur(18px) saturate(160%);
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.86),
+        rgba(17, 24, 39, 0.75),
+        rgba(8, 47, 73, 0.65)
+    );
+}
+
+/* ==========================
+   NAVBAR / HEADER
+   ========================== */
+
+.rusteze-navbar {
+    background: radial-gradient(circle at top left, #4f46e5 0%, #0f172a 45%, #020617 100%);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
 }
 
 .navbar-brand {
-    font-weight: bold;
-    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+}
+
+.rusteze-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(248, 250, 252, 0.9));
 }
 
 .slogan {
     font-style: italic;
-    color: #bdc3c7 !important;
-    margin-left: 10px;
-    font-size: 0.9rem;
+    color: #e5e7eb !important;
+    margin-left: 12px;
+    font-size: 0.85rem;
+    opacity: 0.85;
 }
 
+/* Pill usuario */
+.user-pill {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(156, 163, 175, 0.65);
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid rgba(248, 250, 252, 0.6);
+}
+
+/* ==========================
+   CONTENIDO PRINCIPAL
+   ========================== */
+
+.rusteze-main {
+    flex: 1;
+    padding: 2rem 0 2.5rem;
+}
+
+/* ==========================
+   CARDS / TABLAS / GLASS
+   ========================== */
+
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    margin-bottom: 1rem;
-    border-radius: 0.5rem;
+    background: var(--glass-card-bg);
+    border-radius: 0.9rem;
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
+    color: var(--light-color);
+    margin-bottom: 1.25rem;
 }
 
 .card-header {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: bold;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(110, 231, 183, 0.4));
+    color: #f9fafb;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.4);
 }
 
+/* Tarjetas de estadísticas */
 .stat-card {
-    text-align: center;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    color: white;
-    border: none;
+    border-radius: 1rem;
+    color: #f9fafb;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.95);
+    padding: 1.4rem 1.3rem;
+    background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.stat-card.primary { background: linear-gradient(45deg, var(--primary-color), #34495e); }
-.stat-card.success { background: linear-gradient(45deg, var(--success-color), #2ecc71); }
-.stat-card.warning { background: linear-gradient(45deg, var(--warning-color), #f1c40f); }
-.stat-card.info { background: linear-gradient(45deg, var(--secondary-color), #2980b9); }
+.stat-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.98);
+}
+
+.stat-card .display-6 {
+    font-weight: 700;
+}
+
+/* ==========================
+   TABLAS
+   ========================== */
+
+.table {
+    margin-bottom: 0;
+    color: #e5e7eb;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #e5e7eb;
+    border-bottom: none;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.table tbody tr {
+    border-color: rgba(55, 65, 81, 0.7);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(31, 41, 55, 0.9);
+}
+
+/* ==========================
+   VEHÍCULOS / CARDS
+   ========================== */
 
 .vehicle-card {
-    transition: transform 0.2s, box-shadow 0.2s;
     height: 100%;
-    border: none;
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    background: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.95));
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.96);
+    overflow: hidden;
+    transform-origin: center;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .vehicle-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(248, 250, 252, 0.85);
+    box-shadow:
+        0 26px 65px rgba(15, 23, 42, 0.98),
+        0 0 40px rgba(96, 165, 250, 0.25);
 }
 
 .vehicle-img {
-    height: 200px;
-    object-fit: cover;
+    height: 190px;
     width: 100%;
-    border-radius: 0.5rem 0.5rem 0 0;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.9);
 }
 
 .price-tag {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: var(--success-color);
 }
 
 .badge-status {
-    font-size: 0.8rem;
-    padding: 0.4em 0.6em;
-}
-
-/* Dashboard específico */
-.sidebar {
-    background-color: var(--primary-color);
-    color: white;
-    min-height: calc(100vh - 56px);
-    padding: 0;
-}
-
-.sidebar .nav-link {
-    color: #bdc3c7;
-    padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid #34495e;
-    transition: all 0.3s;
-}
-
-.sidebar .nav-link:hover {
-    color: white;
-    background-color: #34495e;
-}
-
-.sidebar .nav-link.active {
-    color: white;
-    background-color: var(--secondary-color);
-}
-
-.main-content {
-    padding: 2rem;
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 56px);
-}
-
-/* Login page */
-.login-container {
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.login-card {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-}
-
-/* Tablas */
-.table th {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-}
-
-.table td {
-    vertical-align: middle;
-}
-
-/* Botones */
-.btn {
-    border-radius: 0.5rem;
-    font-weight: 500;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        min-height: auto;
-    }
-    
-    .stat-card {
-        margin-bottom: 1rem;
-    }
-    
-    .main-content {
-        padding: 1rem;
-    }
-}
-
-/* Animaciones */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+    border-radius: 999px;
 }
 
 /* Estados de vehículos */
 .estado-disponible { color: var(--success-color); }
 .estado-vendido { color: var(--danger-color); }
 .estado-reservado { color: var(--warning-color); }
+
+/* ==========================
+   LOGIN
+   ========================== */
+
+.login-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+}
+
+.login-card {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    background: radial-gradient(circle at top left,
+        rgba(79, 70, 229, 0.18),
+        rgba(15, 23, 42, 0.95)
+    );
+    box-shadow:
+        0 26px 70px rgba(15, 23, 42, 0.99),
+        0 0 60px rgba(59, 130, 246, 0.5);
+}
+
+/* ==========================
+   BOTONES
+   ========================== */
+
+.btn {
+    border-radius: 999px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    border-color: transparent;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca, #4f46e5);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: transparent;
+}
+
+.btn-outline-light {
+    border-radius: 999px;
+}
+
+/* ==========================
+   ALERTAS
+   ========================== */
+
+.glass-alert {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: rgba(15, 23, 42, 0.92);
+    color: #e5e7eb;
+}
+
+/* ==========================
+   FOOTER
+   ========================== */
+
+.rusteze-footer {
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    background: radial-gradient(circle at bottom right, #020617, #020617 30%, #0b1120 100%);
+    color: #9ca3af;
+    padding: 1.4rem 0 1.7rem;
+    text-align: center;
+}
+
+.footer-quote {
+    font-size: 0.85rem;
+    color: #e5e7eb;
+}
+
+/* ==========================
+   ANIMACIONES
+   ========================== */
+
+.fade-in {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+/* ==========================
+   RESPONSIVE
+   ========================== */
+
+@media (max-width: 768px) {
+    .rusteze-main {
+        padding: 1.4rem 0 2rem;
+    }
+
+    .login-card {
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.98);
+    }
+
+    .navbar-brand span {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+{% block title %}Vehículos - Administración{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Vehículos</h3>
+    <a href="{{ url_for('admin.vehiculos_nuevo') }}" class="btn btn-primary btn-sm">Nuevo vehículo</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Vehículo</th>
+          <th>Año</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for v in vehiculos %}
+        <tr>
+          <td>{{ v.vehiculo_id }}</td>
+          <td>{{ v.marca }} {{ v.modelo }}</td>
+          <td>{{ v.anio }}</td>
+          <td>{{ format_currency(v.precio) }}</td>
+          <td>{{ v.estado_disponibilidad }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('admin.vehiculos_editar', vehiculo_id=v.vehiculo_id) }}" class="btn btn-sm btn-secondary">Editar</a>
+            <form method="POST" action="{{ url_for('admin.vehiculos_eliminar', vehiculo_id=v.vehiculo_id) }}"
+                  style="display:inline-block" onsubmit="return confirm('¿Eliminar vehículo?');">
+              <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="text-muted">No hay vehículos registrados.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

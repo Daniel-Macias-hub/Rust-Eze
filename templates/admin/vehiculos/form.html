@@ -1,0 +1,71 @@
+{% extends "layouts/base.html" %}
+{% block title %}{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} Vehículo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} vehículo</h3>
+
+  <form method="POST">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Marca</label>
+          <input name="marca" class="form-control" required
+                 value="{{ (vehiculo.marca if vehiculo else '') }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Modelo</label>
+          <input name="modelo" class="form-control" required
+                 value="{{ (vehiculo.modelo if vehiculo else '') }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Año</label>
+          <input name="anio" type="number" class="form-control" required
+                 value="{{ (vehiculo.anio if vehiculo else '') }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Precio</label>
+          <input name="precio" type="number" step="0.01" class="form-control" required
+                 value="{{ (vehiculo.precio if vehiculo else '') }}">
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Color</label>
+          <input name="color" class="form-control" required
+                 value="{{ (vehiculo.color if vehiculo else '') }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tipo</label>
+          <input name="tipo" class="form-control" required
+                 value="{{ (vehiculo.tipo if vehiculo else '') }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Estado</label>
+          <select name="estado_disponibilidad" class="form-select">
+            {% set estado = vehiculo.estado_disponibilidad if vehiculo else 'Disponible' %}
+            <option value="Disponible" {{ 'selected' if estado=='Disponible' else '' }}>Disponible</option>
+            <option value="Vendido" {{ 'selected' if estado=='Vendido' else '' }}>Vendido</option>
+            <option value="Reservado" {{ 'selected' if estado=='Reservado' else '' }}>Reservado</option>
+            <option value="Mantenimiento" {{ 'selected' if estado=='Mantenimiento' else '' }}>Mantenimiento</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">URL de imagen</label>
+          <input name="imagen_url" class="form-control"
+                 value="{{ (vehiculo.imagen_url if vehiculo else '') }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Descripción</label>
+      <textarea name="descripcion" rows="3" class="form-control">{{ (vehiculo.descripcion if vehiculo else '') }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('admin.vehiculos_list') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

@@ -6,15 +6,33 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
+            <!-- Mensajes flash (si no los manejas en base.html, puedes agregarlos aquí) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mb-3">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h4>
+                    <h4 class="mb-0">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('auth.login') }}">
                         <div class="mb-3">
                             <label for="user_type" class="form-label">Tipo de Usuario</label>
-                            <select class="form-select" id="user_type" name="user_type" required>
+                            <select class="form-select form-control" id="user_type" name="user_type" required>
                                 <option value="client">Cliente</option>
                                 <option value="admin">Administrador/Empleado</option>
                             </select>
@@ -22,18 +40,30 @@
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="tu@email.com" required>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email"
+                                placeholder="tu@email.com"
+                                required
+                            >
                         </div>
                         
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="Tu contraseña" required>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password"
+                                placeholder="Tu contraseña"
+                                required
+                            >
                         </div>
                         
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary btn-block">
                                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                             </button>
                         </div>
@@ -57,6 +87,10 @@
                             <strong>Admin:</strong> admin@rusteze.com / hashed_password_123<br>
                             <strong>Cliente:</strong> cliente@ejemplo.com / hashed_password_123
                         </small>
+                        <p class="mt-2 mb-0">
+                            Estas credenciales corresponden a los registros iniciales que insertaste en
+                            las tablas <code>Empleados</code> y <code>Clientes</code>.
+                        </p>
                     </div>
                 </div>
             </div>

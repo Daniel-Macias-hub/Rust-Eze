@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.17",
+    "gsap": "^3.13.0",
+    "ogl": "^1.0.11",
+    "tailwindcss": "^4.1.17",
+    "three": "^0.181.2"
+  }
+}

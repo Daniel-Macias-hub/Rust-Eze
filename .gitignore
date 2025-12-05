@@ -1,0 +1,22 @@
+# Entornos Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Node / frontend
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Configuración local / secretos
+.env
+*.log
+
+# IDEs / editor
+.vscode/
+.idea/
+
+# Otros generados
+*.sqlite3

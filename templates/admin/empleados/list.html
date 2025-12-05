@@ -1,0 +1,59 @@
+{% extends "layouts/base.html" %}
+{% block title %}Empleados - Administración{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Empleados</h3>
+    <a href="{{ url_for('admin.empleados_nuevo') }}" class="btn btn-primary btn-sm">
+      Nuevo empleado
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Puesto</th>
+          <th>Admin</th>
+          <th>Activo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for e in empleados %}
+        <tr>
+          <td>{{ e.empleado_id }}</td>
+          <td>{{ e.nombre_completo }}</td>
+          <td>{{ e.email }}</td>
+          <td>{{ e.puesto }}</td>
+          <td>{{ 'Sí' if e.es_administrador else 'No' }}</td>
+          <td>{{ 'Sí' if e.activo else 'No' }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('admin.empleados_editar', empleado_id=e.empleado_id) }}"
+               class="btn btn-sm btn-secondary">
+              Editar
+            </a>
+            <form method="POST"
+                  action="{{ url_for('admin.empleados_eliminar', empleado_id=e.empleado_id) }}"
+                  style="display:inline-block"
+                  onsubmit="return confirm('¿Desactivar empleado?');">
+              <button type="submit" class="btn btn-sm btn-danger">
+                Desactivar
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="7" class="text-muted">No hay empleados registrados.</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,261 +1,82 @@
-{% extends "layouts/admin_base.html" %}
+{% extends "layouts/base.html" %}
+{% block title %}Panel de Administración - Rust-Eze{% endblock %}
 
-{% block title %}Dashboard - Admin{% endblock %}
-{% block page_title %}Dashboard Administrativo{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Panel de Administración</h2>
 
-{% block admin_content %}
-<div class="row mb-4">
-    <!-- Estadísticas principales -->
-    <div class="col-md-3 mb-4">
-        <div class="card stat-card primary">
-            <div class="card-body text-center">
-                <i class="fas fa-car fa-3x mb-3"></i>
-                <h3>{{ stats.total_vehiculos or 0 }}</h3>
-                <p class="mb-0">Vehículos Totales</p>
-                <small>{{ stats.vehiculos_disponibles or 0 }} disponibles</small>
-            </div>
+  <div class="row mt-3">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Vehículos</h5>
+          <p class="display-6">{{ stats.vehiculos }}</p>
+          <a href="{{ url_for('admin.vehiculos_list') }}" class="btn btn-sm btn-primary">Gestionar</a>
         </div>
+      </div>
     </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-                <h3>{{ stats.ventas_mes or 0 }}</h3>
-                <p class="mb-0">Ventas del Mes</p>
-                <small>{{ stats.ingresos_mes|format_currency if stats.ingresos_mes else '$0' }}</small>
-            </div>
+
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Clientes activos</h5>
+          <p class="display-6">{{ stats.clientes }}</p>
+          <a href="{{ url_for('admin.clientes_list') }}" class="btn btn-sm btn-primary">Gestionar</a>
         </div>
+      </div>
     </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-3x mb-3"></i>
-                <h3>{{ stats.total_clientes or 0 }}</h3>
-                <p class="mb-0">Clientes Activos</p>
-                <small>{{ stats.clientes_nuevos or 0 }} nuevos</small>
-            </div>
+
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Empleados</h5>
+          <p class="display-6">{{ stats.empleados }}</p>
+          <a href="{{ url_for('admin.empleados_list') }}" class="btn btn-sm btn-primary">Gestionar</a>
         </div>
+      </div>
     </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card stat-card info">
-            <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-3x mb-3"></i>
-                <h3>{{ stats.tasa_conversion or 0 }}%</h3>
-                <p class="mb-0">Tasa Conversión</p>
-                <small>Este mes</small>
-            </div>
+
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Ventas</h5>
+          <p class="display-6">{{ stats.ventas }}</p>
+          <a href="{{ url_for('admin.ventas_list') }}" class="btn btn-sm btn-primary">Ver ventas</a>
         </div>
+      </div>
     </div>
+  </div>
+
+  <h4 class="mt-4">Ventas recientes</h4>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Empleado</th>
+          <th>Total</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for v in ventas_recientes %}
+        <tr>
+          <td>{{ v.venta_id }}</td>
+          <td>{{ v.fecha_venta }}</td>
+          <td>{{ v.cliente }}</td>
+          <td>{{ v.empleado }}</td>
+          <td>{{ format_currency(v.total_venta) }}</td>
+          <td>{{ v.estado_venta }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="6" class="text-muted">No hay ventas registradas.</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
-
-<div class="row">
-    <!-- Gráficos y reportes -->
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-bar me-2"></i>Ventas Mensuales
-                </h5>
-            </div>
-            <div class="card-body">
-                <canvas id="ventasChart" height="250"></canvas>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-trophy me-2"></i>Top Marcas
-                </h5>
-            </div>
-            <div class="card-body">
-                <div id="topMarcasList">
-                    <!-- Se llenará con JavaScript -->
-                    <div class="text-center py-3">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Acciones rápidas -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.vehiculos') }}" class="btn btn-outline-primary w-100 h-100 py-3">
-                            <i class="fas fa-car fa-2x mb-2"></i><br>
-                            Gestionar Vehículos
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.ventas') }}" class="btn btn-outline-success w-100 h-100 py-3">
-                            <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
-                            Registrar Venta
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.auditoria') }}" class="btn btn-outline-warning w-100 h-100 py-3">
-                            <i class="fas fa-clipboard-check fa-2x mb-2"></i><br>
-                            Ver Auditoría
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{{ url_for('admin.reportes') }}" class="btn btn-outline-info w-100 h-100 py-3">
-                            <i class="fas fa-chart-pie fa-2x mb-2"></i><br>
-                            Reportes Avanzados
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-// Función para formatear moneda
-function formatCurrency(value) {
-    if (typeof value !== 'number') {
-        value = parseFloat(value);
-    }
-    // Asumimos USD, puedes cambiarlo a tu moneda local
-    return new Intl.NumberFormat('en-US', { 
-        style: 'currency', 
-        currency: 'USD' 
-    }).format(value || 0);
-}
-
-// Cargar top marcas
-async function cargarTopMarcas() {
-    try {
-        const response = await fetch('/admin/api/ranking-marcas');
-        const data = await response.json();
-        
-        if (data.success && data.data.length > 0) {
-            const container = document.getElementById('topMarcasList');
-            let html = '';
-            
-            data.data.forEach((marca, index) => {
-                const badgeColor = index === 0 ? 'bg-warning' : 
-                                 index === 1 ? 'bg-secondary' : 
-                                 index === 2 ? 'bg-danger' : 'bg-info';
-                
-                html += `
-                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-                    <div>
-                        <span class="badge ${badgeColor} me-2">${marca.dense_rank}</span>
-                        <strong>${marca.marca}</strong>
-                    </div>
-                    <div class="text-end">
-                        <small class="text-muted d-block">${marca.unidades_vendidas} unidades</small>
-                        <small class="text-success">${formatCurrency(marca.ingreso_total)}</small>
-                    </div>
-                </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-    } catch (error) {
-        console.error('Error cargando top marcas:', error);
-    }
-}
-
-// Inicializar gráfico
-async function inicializarGrafico() {
-    try {
-        const response = await fetch('/admin/api/ventas-por-mes-marca');
-        const apiData = await response.json();
-
-        if (apiData.success && apiData.data.length > 0) {
-            const ctx = document.getElementById('ventasChart').getContext('2d');
-            const data = apiData.data;
-
-            // Extraer etiquetas (meses) y marcas
-            const labels = data.map(d => d.mes_nombre);
-            const marcas = Object.keys(data[0]).filter(k => k !== 'mes_nombre' && k !== 'mes_numero');
-            
-            // Paleta de colores para las marcas
-            const colors = [
-                'rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'
-            ];
-
-            const datasets = marcas.map((marca, index) => ({
-                label: marca,
-                data: data.map(d => d[marca] || 0),
-                borderColor: colors[index % colors.length],
-                backgroundColor: colors[index % colors.length].replace('1)', '0.2)'),
-                tension: 0.1,
-                fill: true
-            }));
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Ventas Mensuales por Marca'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        } else {
-             document.getElementById('ventasChart').outerHTML = `
-                <div class="text-center py-5">
-                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No hay datos de ventas para mostrar en el gráfico.</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error inicializando gráfico:', error);
-         document.getElementById('ventasChart').outerHTML = `
-            <div class="text-center py-5 text-danger">
-                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                <p>Error al cargar los datos del gráfico.</p>
-                <small>${error.message}</small>
-            </div>
-        `;
-    }
-}
-
-// Cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    cargarTopMarcas();
-    inicializarGrafico();
-});
-</script>
 {% endblock %}

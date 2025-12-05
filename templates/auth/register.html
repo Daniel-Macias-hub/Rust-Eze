@@ -1,0 +1,103 @@
+{% extends "layouts/base.html" %}
+{% block title %}Registro de Cliente - Rust-Eze{% endblock %}
+
+{% block content %}
+<div class="login-container fade-in">
+    <div class="card login-card">
+        <!-- Encabezado -->
+        <div class="card-header d-flex align-items-center">
+            <i class="fas fa-user-plus me-2"></i>
+            <span>Registro de Cliente</span>
+        </div>
+
+        <!-- Cuerpo del formulario -->
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('auth.register') }}">
+                <!-- Nombre completo -->
+                <div class="mb-3">
+                    <label class="form-label">Nombre completo *</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="nombre_completo"
+                        required
+                        value="{{ request.form.nombre_completo or '' }}"
+                    >
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Correo electrónico *</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        required
+                        value="{{ request.form.email or '' }}"
+                    >
+                </div>
+
+                <!-- Teléfono -->
+                <div class="mb-3">
+                    <label class="form-label">Teléfono</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="telefono"
+                        value="{{ request.form.telefono or '' }}"
+                    >
+                </div>
+
+                <!-- Dirección -->
+                <div class="mb-3">
+                    <label class="form-label">Dirección</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="direccion"
+                        value="{{ request.form.direccion or '' }}"
+                    >
+                </div>
+
+                <!-- Contraseña -->
+                <div class="mb-3">
+                    <label class="form-label">Contraseña *</label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        name="password"
+                        required
+                    >
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="mb-4">
+                    <label class="form-label">Confirmar contraseña *</label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        name="password2"
+                        required
+                    >
+                </div>
+
+                <!-- Botón -->
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Crear cuenta
+                </button>
+            </form>
+        </div>
+
+        <!-- Pie / link a login -->
+        <div class="card-footer text-center">
+            <small>
+                ¿Ya tienes una cuenta?
+                <a href="{{ url_for('auth.login') }}" class="text-decoration-none">
+                    Inicia sesión aquí
+                </a>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
