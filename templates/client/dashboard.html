@@ -2,99 +2,145 @@
 {% block title %}Panel de Cliente - Rust-Eze{% endblock %}
 
 {% block content %}
-<div class="container mt-4 fade-in-up">
-    <h2 class="mb-4">Bienvenido, {{ session.get('user_name', 'Cliente') }}</h2>
+<div class="container fade-in-up">
+    <!-- Hero -->
+    <section class="hero-shell mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="hero-chip">
+                    <i class="fa-solid fa-car-side"></i>
+                    Panel de cliente
+                </span>
+                <h2 class="hero-title">
+                    Explora, <span class="hero-gradient">elige y compra</span> tu próximo vehículo.
+                </h2>
+                <p class="hero-subtitle">
+                    Bienvenido, {{ session.get('user_name', 'Cliente') }}.  
+                    Desde aquí puedes ver los vehículos disponibles y consultar tu historial de compras.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-uppercase" style="font-size:.8rem;letter-spacing:.12em;">
+                            Resumen rápido
+                        </span>
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <p class="mb-1 text-muted" style="font-size:.85rem;">
+                        Vehículos listos para ti:
+                    </p>
+                    <h3 class="display-6 mb-0">
+                        {{ vehiculos|length }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Vehículos disponibles -->
-        <div class="col-md-7 mb-4">
-            <h4 class="mb-3">
-                <i class="fa-solid fa-car-side me-2"></i>Vehículos disponibles
-            </h4>
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>Vehículo</th>
-                            <th>Año</th>
-                            <th>Precio</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for v in vehiculos %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    {% if v.imagen_url %}
-                                        <img src="{{ v.imagen_url }}" alt="{{ v.marca }} {{ v.modelo }}" class="vehicle-thumb me-2">
-                                    {% else %}
-                                        <div class="vehicle-thumb me-2 d-flex align-items-center justify-content-center bg-dark">
-                                            <i class="fa-solid fa-car"></i>
-                                        </div>
-                                    {% endif %}
-                                    <div>
-                                        <strong>{{ v.marca }} {{ v.modelo }}</strong><br>
-                                        <small class="text-muted">{{ v.tipo }}</small>
-                                    </div>
+        <div class="col-lg-7">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h4 class="mb-0">Vehículos disponibles</h4>
+            </div>
+            <div class="row g-3">
+                {% for v in vehiculos %}
+                    <div class="col-md-6">
+                        <div class="vehicle-card h-100 d-flex flex-column">
+                            <img src="{{ v.imagen_url or url_for('static', filename='images/vehicles/corolla.jpg') }}"
+                                 alt="{{ v.marca }} {{ v.modelo }}"
+                                 class="vehicle-img">
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0">{{ v.marca }} {{ v.modelo }}</h5>
+                                    <span class="badge-status">
+                                        {{ v.anio }}
+                                    </span>
                                 </div>
-                            </td>
-                            <td>{{ v.anio }}</td>
-                            <td>{{ format_currency(v.precio) }}</td>
-                            <td>
+                                <p class="text-muted mb-2" style="font-size:.85rem;">
+                                    {{ v.tipo }} • {{ v.color }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="price-tag">
+                                        {{ format_currency(v.precio) }}
+                                    </span>
+                                    {% if v.estado_disponibilidad == 'Disponible' %}
+                                        <span class="badge-status estado-disponible">
+                                            {{ v.estado_disponibilidad }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-status estado-{{ v.estado_disponibilidad|lower }}">
+                                            {{ v.estado_disponibilidad }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                                 {% if v.estado_disponibilidad == 'Disponible' %}
-                                <form method="POST" action="{{ url_for('client.comprar', vehiculo_id=v.vehiculo_id) }}">
-                                    <button type="submit" class="btn btn-sm btn-success">
-                                        <i class="fa-solid fa-cart-shopping me-1"></i>Comprar
-                                    </button>
-                                </form>
+                                    <form method="POST"
+                                          action="{{ url_for('client.comprar', vehiculo_id=v.vehiculo_id) }}"
+                                          class="mt-auto">
+                                        <button type="submit" class="btn btn-success w-100 btn-sm">
+                                            <i class="fa-solid fa-cart-shopping me-1"></i>
+                                            Comprar ahora
+                                        </button>
+                                    </form>
                                 {% else %}
-                                    <span class="badge bg-secondary">{{ v.estado_disponibilidad }}</span>
+                                    <button class="btn btn-secondary btn-sm w-100 mt-auto" disabled>
+                                        No disponible
+                                    </button>
                                 {% endif %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="4" class="text-muted">No hay vehículos disponibles.</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="card p-3 text-center">
+                            <span class="text-muted">No hay vehículos disponibles en este momento.</span>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
 
         <!-- Historial de compras -->
-        <div class="col-md-5">
-            <h4 class="mb-3">
-                <i class="fa-solid fa-receipt me-2"></i>Historial de compras
-            </h4>
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Fecha</th>
-                            <th>Vehículo</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for h in historial %}
-                        <tr>
-                            <td>{{ h.venta_id }}</td>
-                            <td>{{ h.fecha_venta }}</td>
-                            <td>{{ h.marca }} {{ h.modelo }}</td>
-                            <td>{{ format_currency(h.total_venta) }}</td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="4" class="text-muted">Aún no has realizado compras.</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <span>Historial de compras</span>
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Vehículo</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for h in historial %}
+                                <tr>
+                                    <td>{{ h.venta_id }}</td>
+                                    <td>{{ h.fecha_venta }}</td>
+                                    <td>{{ h.marca }} {{ h.modelo }}</td>
+                                    <td>{{ format_currency(h.total_venta) }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-muted text-center">
+                                        Aún no has realizado compras.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</div> 
 {% endblock %}

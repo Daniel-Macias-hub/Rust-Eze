@@ -1,68 +1,121 @@
 {% extends "layouts/base.html" %}
-{% block title %}{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} Cliente{% endblock %}
+{% block title %}{{ 'Editar cliente' if cliente else 'Nuevo cliente' }} - Rust-Eze{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h3>{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} cliente</h3>
+<div class="container fade-in-up">
 
-  <form method="POST">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label class="form-label">Nombre completo</label>
-          <input name="nombre_completo" class="form-control" required
-                 value="{{ (cliente.nombre_completo if cliente else '') }}">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input name="email" type="email" class="form-control" required
-                 value="{{ (cliente.email if cliente else '') }}">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Teléfono</label>
-          <input name="telefono" class="form-control"
-                 value="{{ (cliente.telefono if cliente else '') }}">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Dirección</label>
-          <input name="direccion" class="form-control"
-                 value="{{ (cliente.direccion if cliente else '') }}">
-        </div>
-      </div>
+    <section class="hero-shell">
+        <span class="hero-chip">
+            <i class="fa-solid fa-id-card"></i>
+            Clientes
+        </span>
+        <h2 class="hero-title">
+            {{ 'Editar' if cliente else 'Registrar' }}
+            <span class="hero-gradient">Cliente</span>
+        </h2>
+        <p class="hero-subtitle">
+            Completa la información para {{ 'actualizar' if cliente else 'crear' }} un cliente.
+        </p>
+    </section>
 
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label class="form-label">Tipo de documento</label>
-          <input name="tipo_documento" class="form-control"
-                 value="{{ (cliente.tipo_documento if cliente else 'INE') }}">
+    <div class="card">
+        <div class="card-header">
+            {{ 'Edición de cliente' if cliente else 'Alta de cliente' }}
         </div>
-        <div class="mb-3">
-          <label class="form-label">Número de documento</label>
-          <input name="numero_documento" class="form-control"
-                 value="{{ (cliente.numero_documento if cliente else 'POR_ASIGNAR') }}">
-        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre completo</label>
+                        <input class="form-control"
+                               name="nombre_completo"
+                               value="{{ cliente.nombre_completo if cliente else '' }}"
+                               required>
+                    </div>
 
-        {% if modo == 'editar' %}
-        <div class="mb-3">
-          <label class="form-label">Activo</label>
-          <select name="activo" class="form-select">
-            <option value="1" {{ 'selected' if cliente.activo else '' }}>Sí</option>
-            <option value="0" {{ '' if cliente.activo else 'selected' }}>No</option>
-          </select>
-        </div>
-        {% endif %}
+                    <div class="col-md-6">
+                        <label class="form-label">Correo electrónico</label>
+                        <input class="form-control"
+                               type="email"
+                               name="email"
+                               value="{{ cliente.email if cliente else '' }}"
+                               required>
+                    </div>
 
-        <div class="mb-3">
-          <label class="form-label">
-            Contraseña {% if modo == 'editar' %}(dejar en blanco para no cambiar){% endif %}
-          </label>
-          <input name="password" type="password" class="form-control">
+                    <div class="col-md-4">
+                        <label class="form-label">Teléfono</label>
+                        <input class="form-control"
+                               name="telefono"
+                               value="{{ cliente.telefono if cliente else '' }}">
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">Dirección</label>
+                        <input class="form-control"
+                               name="direccion"
+                               value="{{ cliente.direccion if cliente else '' }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo documento</label>
+                        <select class="form-select" name="tipo_documento" required>
+                            {% set td = cliente.tipo_documento if cliente else 'INE' %}
+                            <option value="INE" {{ 'selected' if td == 'INE' else '' }}>INE</option>
+                            <option value="Pasaporte" {{ 'selected' if td == 'Pasaporte' else '' }}>Pasaporte</option>
+                            <option value="Otro" {{ 'selected' if td == 'Otro' else '' }}>Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Número documento</label>
+                        <input class="form-control"
+                               name="numero_documento"
+                               value="{{ cliente.numero_documento if cliente else '' }}"
+                               required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Estado</label>
+                        {% set act = cliente.activo if cliente else 1 %}
+                        <select class="form-select" name="activo">
+                            <option value="1" {{ 'selected' if act else '' }}>Activo</option>
+                            <option value="0" {{ 'selected' if not act else '' }}>Inactivo</option>
+                        </select>
+                    </div>
+
+                    {% if not cliente %}
+                    <div class="col-md-6">
+                        <label class="form-label">Contraseña inicial</label>
+                        <input class="form-control"
+                               type="password"
+                               name="password"
+                               placeholder="••••••••"
+                               required>
+                    </div>
+                    {% else %}
+                    <div class="col-md-6">
+                        <label class="form-label">Nueva contraseña (opcional)</label>
+                        <input class="form-control"
+                               type="password"
+                               name="password"
+                               placeholder="Dejar vacío para no cambiar">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>
+                        Guardar
+                    </button>
+                    <a class="btn btn-outline-light"
+                       href="{{ url_for('admin.clientes_list') }}">
+                        Volver
+                    </a>
+                </div>
+            </form>
         </div>
-      </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a href="{{ url_for('admin.clientes_list') }}" class="btn btn-secondary">Cancelar</a>
-  </form>
 </div>
 {% endblock %}

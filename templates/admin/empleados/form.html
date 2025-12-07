@@ -1,69 +1,108 @@
 {% extends "layouts/base.html" %}
-{% block title %}{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} Empleado{% endblock %}
+{% block title %}{{ 'Editar empleado' if empleado else 'Nuevo empleado' }} - Rust-Eze{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h3>{{ 'Nuevo' if modo == 'nuevo' else 'Editar' }} empleado</h3>
+<div class="container fade-in-up">
 
-  <form method="POST" class="mt-3">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label class="form-label">Nombre completo</label>
-          <input name="nombre_completo" class="form-control" required
-                 value="{{ (empleado.nombre_completo if empleado else '') }}">
-        </div>
+    <section class="hero-shell">
+        <span class="hero-chip">
+            <i class="fa-solid fa-briefcase"></i>
+            Empleados
+        </span>
+        <h2 class="hero-title">
+            {{ 'Editar' if empleado else 'Registrar' }}
+            <span class="hero-gradient">Empleado</span>
+        </h2>
+        <p class="hero-subtitle">
+            Configura puesto, estado y permisos administrativos.
+        </p>
+    </section>
 
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input name="email" type="email" class="form-control" required
-                 value="{{ (empleado.email if empleado else '') }}">
+    <div class="card">
+        <div class="card-header">
+            {{ 'Edición de empleado' if empleado else 'Alta de empleado' }}
         </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre completo</label>
+                        <input class="form-control"
+                               name="nombre_completo"
+                               value="{{ empleado.nombre_completo if empleado else '' }}"
+                               required>
+                    </div>
 
-        <div class="mb-3">
-          <label class="form-label">Puesto</label>
-          {% set puesto = empleado.puesto if empleado else 'Vendedor' %}
-          <select name="puesto" class="form-select" required>
-            <option value="Gerente" {{ 'selected' if puesto == 'Gerente' else '' }}>Gerente</option>
-            <option value="Vendedor" {{ 'selected' if puesto == 'Vendedor' else '' }}>Vendedor</option>
-            <option value="Administrativo" {{ 'selected' if puesto == 'Administrativo' else '' }}>Administrativo</option>
-          </select>
-        </div>
-      </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Correo electrónico</label>
+                        <input class="form-control"
+                               type="email"
+                               name="email"
+                               value="{{ empleado.email if empleado else '' }}"
+                               required>
+                    </div>
 
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label class="form-label">¿Es administrador?</label>
-          {% set es_admin = empleado.es_administrador if empleado is not none else 0 %}
-          <select name="es_administrador" class="form-select">
-            <option value="1" {{ 'selected' if es_admin else '' }}>Sí</option>
-            <option value="0" {{ '' if es_admin else 'selected' }}>No</option>
-          </select>
-        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Puesto</label>
+                        {% set p = empleado.puesto if empleado else 'Vendedor' %}
+                        <select class="form-select" name="puesto" required>
+                            <option value="Gerente" {{ 'selected' if p == 'Gerente' else '' }}>Gerente</option>
+                            <option value="Vendedor" {{ 'selected' if p == 'Vendedor' else '' }}>Vendedor</option>
+                            <option value="Administrativo" {{ 'selected' if p == 'Administrativo' else '' }}>Administrativo</option>
+                        </select>
+                    </div>
 
-        {% if modo == 'editar' %}
-        <div class="mb-3">
-          <label class="form-label">Activo</label>
-          {% set activo = empleado.activo if empleado is not none else 1 %}
-          <select name="activo" class="form-select">
-            <option value="1" {{ 'selected' if activo else '' }}>Sí</option>
-            <option value="0" {{ '' if activo else 'selected' }}>No</option>
-          </select>
-        </div>
-        {% endif %}
+                    <div class="col-md-4">
+                        <label class="form-label">Administrador</label>
+                        {% set ea = empleado.es_administrador if empleado else 0 %}
+                        <select class="form-select" name="es_administrador">
+                            <option value="1" {{ 'selected' if ea else '' }}>Sí</option>
+                            <option value="0" {{ 'selected' if not ea else '' }}>No</option>
+                        </select>
+                    </div>
 
-        <div class="mb-3">
-          <label class="form-label">
-            Contraseña
-            {% if modo == 'editar' %}(dejar en blanco para no cambiar){% endif %}
-          </label>
-          <input name="password" type="password" class="form-control">
+                    <div class="col-md-4">
+                        <label class="form-label">Estado</label>
+                        {% set act = empleado.activo if empleado else 1 %}
+                        <select class="form-select" name="activo">
+                            <option value="1" {{ 'selected' if act else '' }}>Activo</option>
+                            <option value="0" {{ 'selected' if not act else '' }}>Inactivo</option>
+                        </select>
+                    </div>
+
+                    {% if not empleado %}
+                    <div class="col-md-6">
+                        <label class="form-label">Contraseña inicial</label>
+                        <input class="form-control"
+                               type="password"
+                               name="password"
+                               placeholder="••••••••"
+                               required>
+                    </div>
+                    {% else %}
+                    <div class="col-md-6">
+                        <label class="form-label">Nueva contraseña (opcional)</label>
+                        <input class="form-control"
+                               type="password"
+                               name="password"
+                               placeholder="Dejar vacío para no cambiar">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>
+                        Guardar
+                    </button>
+                    <a class="btn btn-outline-light"
+                       href="{{ url_for('admin.empleados_list') }}">
+                        Volver
+                    </a>
+                </div>
+            </form>
         </div>
-      </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a href="{{ url_for('admin.empleados_list') }}" class="btn btn-secondary">Cancelar</a>
-  </form>
 </div>
 {% endblock %}

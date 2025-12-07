@@ -2,102 +2,216 @@
 {% block title %}Registro de Cliente - Rust-Eze{% endblock %}
 
 {% block content %}
-<div class="login-container fade-in">
-    <div class="card login-card">
-        <!-- Encabezado -->
-        <div class="card-header d-flex align-items-center">
-            <i class="fas fa-user-plus me-2"></i>
-            <span>Registro de Cliente</span>
+<div class="container">
+
+  <!-- ==========================
+       HERO / PRESENTACIÓN REGISTRO
+       ========================== -->
+  <section class="py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7 fade-in">
+        <span class="badge rounded-pill bg-primary bg-gradient px-3 py-2 mb-3">
+          <i class="fas fa-user-plus me-2"></i> Crear cuenta de cliente
+        </span>
+
+        <h1 class="display-5 fw-bold text-readable mb-3">
+          Únete a <span class="rainbow-title" style="font-size: inherit;">Rust-Eze</span>
+        </h1>
+
+        <p class="text-soft mb-4">
+          Crea tu cuenta para acceder al catálogo de vehículos, revisar tu historial de compras
+          y disfrutar de una experiencia organizada y segura basada en roles y trazabilidad.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light px-4">
+            <i class="fas fa-right-to-bracket me-2"></i> Ya tengo cuenta
+          </a>
+          <a href="{{ url_for('index') }}" class="btn btn-primary px-4">
+            <i class="fas fa-house me-2"></i> Volver al inicio
+          </a>
         </div>
+      </div>
 
-        <!-- Cuerpo del formulario -->
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('auth.register') }}">
-                <!-- Nombre completo -->
-                <div class="mb-3">
-                    <label class="form-label">Nombre completo *</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        name="nombre_completo"
-                        required
-                        value="{{ request.form.nombre_completo or '' }}"
-                    >
-                </div>
-
-                <!-- Email -->
-                <div class="mb-3">
-                    <label class="form-label">Correo electrónico *</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        name="email"
-                        required
-                        value="{{ request.form.email or '' }}"
-                    >
-                </div>
-
-                <!-- Teléfono -->
-                <div class="mb-3">
-                    <label class="form-label">Teléfono</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        name="telefono"
-                        value="{{ request.form.telefono or '' }}"
-                    >
-                </div>
-
-                <!-- Dirección -->
-                <div class="mb-3">
-                    <label class="form-label">Dirección</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        name="direccion"
-                        value="{{ request.form.direccion or '' }}"
-                    >
-                </div>
-
-                <!-- Contraseña -->
-                <div class="mb-3">
-                    <label class="form-label">Contraseña *</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        name="password"
-                        required
-                    >
-                </div>
-
-                <!-- Confirmar contraseña -->
-                <div class="mb-4">
-                    <label class="form-label">Confirmar contraseña *</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        name="password2"
-                        required
-                    >
-                </div>
-
-                <!-- Botón -->
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Crear cuenta
-                </button>
-            </form>
+      <div class="col-lg-5 fade-in">
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-shield-halved me-2"></i> ¿Qué obtienes?
+          </div>
+          <div class="card-body">
+            <ul class="mb-0">
+              <li class="mb-2 text-soft">Acceso al catálogo con estados claros de disponibilidad.</li>
+              <li class="mb-2 text-soft">Flujo de compra respaldado por integridad en base de datos.</li>
+              <li class="mb-2 text-soft">Historial de ventas y trazabilidad de operaciones.</li>
+              <li class="text-soft">Experiencia optimizada para clientes desde el dashboard.</li>
+            </ul>
+          </div>
         </div>
-
-        <!-- Pie / link a login -->
-        <div class="card-footer text-center">
-            <small>
-                ¿Ya tienes una cuenta?
-                <a href="{{ url_for('auth.login') }}" class="text-decoration-none">
-                    Inicia sesión aquí
-                </a>
-            </small>
-        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- ==========================
+       MICRO FEATURES
+       ========================== -->
+  <section class="pb-4">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-car-side me-2"></i> Catálogo premium
+            </h6>
+            <p class="mb-0 text-soft">
+              Visualiza vehículos con información clara, precio y estado.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-lock me-2"></i> Acceso seguro
+            </h6>
+            <p class="mb-0 text-soft">
+              Inicio de sesión por rol con control administrativo separado.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-receipt me-2"></i> Historial y control
+            </h6>
+            <p class="mb-0 text-soft">
+              Consulta compras registradas y estados de tus transacciones.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================
+       FORMULARIO REGISTRO (ESTILO PREMIUM)
+       ========================== -->
+  <section class="login-section">
+    <div class="login-form-card card">
+      <div class="card-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <div class="rainbow-title">Rust-Eze</div>
+            <div class="login-subtitle">Registro de cliente · Acceso al catálogo</div>
+          </div>
+          <span class="badge rounded-pill bg-dark border border-light-subtle px-3 py-2">
+            <i class="fas fa-id-card me-2"></i> Nuevo cliente
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        <form id="registerForm" method="POST" action="{{ url_for('auth.register') }}">
+
+          <div class="mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input type="text"
+                   class="form-control form-control-lg"
+                   name="nombre_completo"
+                   placeholder="Tu nombre y apellidos"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+                   class="form-control form-control-lg"
+                   name="email"
+                   placeholder="tu@email.com"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Teléfono (opcional)</label>
+            <input type="text"
+                   class="form-control form-control-lg"
+                   name="telefono"
+                   placeholder="Ej. 55 1234 5678">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input id="password"
+                   type="password"
+                   class="form-control form-control-lg"
+                   name="password"
+                   placeholder="Crea una contraseña segura"
+                   required>
+            <small class="text-muted d-block mt-2">
+              Sugerencia: usa al menos 8 caracteres.
+            </small>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Confirmar contraseña</label>
+            <input id="confirmPassword"
+                   type="password"
+                   class="form-control form-control-lg"
+                   placeholder="Repite tu contraseña"
+                   required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 btn-login-lg">
+            <i class="fas fa-user-check me-2"></i> Crear cuenta
+          </button>
+
+          <div class="text-center mt-3">
+            <span class="text-soft">¿Ya tienes cuenta?</span>
+            <a href="{{ url_for('auth.login') }}" class="ms-1">
+              Inicia sesión
+            </a>
+          </div>
+
+        </form>
+
+        <div class="demo-credentials mt-4">
+          <small class="text-muted d-block mb-2">
+            Tu cuenta se registrará como cliente y quedará lista para comprar vehículos disponibles.
+          </small>
+          <ul class="mb-0">
+            <li class="text-soft">
+              El sistema asigna valores por defecto a documento si tu backend los maneja así.
+            </li>
+            <li class="text-soft">
+              El administrador podrá ver tu registro desde el panel correspondiente.
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Validación simple de confirmación de contraseña (solo frontend)
+  const form = document.getElementById('registerForm');
+  const pass = document.getElementById('password');
+  const confirmPass = document.getElementById('confirmPassword');
+
+  if (form && pass && confirmPass) {
+    form.addEventListener('submit', function(e) {
+      if (pass.value !== confirmPass.value) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden.');
+        confirmPass.focus();
+      }
+    });
+  }
+</script>
 {% endblock %}

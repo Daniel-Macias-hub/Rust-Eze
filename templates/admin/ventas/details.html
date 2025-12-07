@@ -1,0 +1,158 @@
+{% extends "layouts/base.html" %}
+{% block title %}Detalle venta #{{ venta.venta_id }} - Rust-Eze{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+
+    <section class="hero-shell mb-4">
+        <span class="hero-chip">
+            <i class="fa-solid fa-receipt"></i>
+            Ventas
+        </span>
+        <h2 class="hero-title">
+            Detalle de <span class="hero-gradient">Venta #{{ venta.venta_id }}</span>
+        </h2>
+        <p class="hero-subtitle">
+            Información completa de la operación, cliente, vendedor y vehículo(s).
+        </p>
+    </section>
+
+    <!-- Info principal -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    Resumen
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>ID Venta:</strong> {{ venta.venta_id }}</p>
+                    <p class="mb-1"><strong>Fecha:</strong> {{ venta.fecha_venta }}</p>
+                    <p class="mb-1"><strong>Método de pago:</strong> {{ venta.metodo_pago }}</p>
+                    <p class="mb-1"><strong>Estado:</strong> {{ venta.estado_venta }}</p>
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Total:</strong>
+                        {{ format_currency(venta.total_venta) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    Cliente
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Nombre:</strong> {{ venta.cliente }}</p>
+                    <p class="mb-1"><strong>Correo:</strong> {{ venta.cliente_email or '-' }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> {{ venta.cliente_telefono or '-' }}</p>
+                    <p class="mb-0"><strong>Documento:</strong>
+                        {{ venta.cliente_documento or '-' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    Vendedor
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Nombre:</strong> {{ venta.empleado }}</p>
+                    <p class="mb-1"><strong>Correo:</strong> {{ venta.empleado_email or '-' }}</p>
+                    <p class="mb-1"><strong>Puesto:</strong> {{ venta.empleado_puesto or '-' }}</p>
+                    <p class="mb-0"><strong>Admin:</strong>
+                        {% if venta.empleado_es_admin %}
+                            Sí
+                        {% else %}
+                            No
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalle de vehículos -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Vehículo(s) vendido(s)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Vehículo</th>
+                            <th>Año</th>
+                            <th>Color</th>
+                            <th>Tipo</th>
+                            <th>Precio unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total_calc = 0 %}
+                        {% for d in detalle %}
+                        {% set subtotal = d.precio_unitario * d.cantidad %}
+                        {% set total_calc = total_calc + subtotal %}
+                        <tr>
+                            <td>{{ d.marca }} {{ d.modelo }}</td>
+                            <td>{{ d.anio }}</td>
+                            <td>{{ d.color }}</td>
+                            <td>{{ d.tipo }}</td>
+                            <td>{{ format_currency(d.precio_unitario) }}</td>
+                            <td>{{ d.cantidad }}</td>
+                            <td>{{ format_currency(subtotal) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Esta venta no tiene detalle registrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if detalle %}
+                    <tfoot>
+                        <tr>
+                            <th colspan="6" class="text-end">Total calculado</th>
+                            <th>{{ format_currency(total_calc) }}</th>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.ventas_list') }}" class="btn btn-outline-light">
+            <i class="fa-solid fa-arrow-left-long me-1"></i> Volver al listado
+        </a>
+
+        {% if venta.estado_venta == 'Activa' %}
+        <form method="POST" action="{{ url_for('admin.ventas_cancel', venta_id=venta.venta_id) }}">
+            <button type="button"
+                    class="btn btn-warning"
+                    onclick="confirmAction('¿Cancelar esta venta? El vehículo volverá a estar disponible.', () => this.closest('form').submit())">
+                <i class="fa-solid fa-ban me-1"></i> Cancelar venta
+            </button>
+        </form>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('admin.ventas_delete', venta_id=venta.venta_id) }}">
+            <button type="button"
+                    class="btn btn-danger"
+                    onclick="confirmAction('¿Eliminar definitivamente esta venta?', () => this.closest('form').submit())">
+                <i class="fa-solid fa-trash me-1"></i> Eliminar
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

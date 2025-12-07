@@ -14,10 +14,10 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="rusteze-body">
-    <!-- Fondo animado Prism -->
-    <div id="prism-bg"></div>
+    <!-- Fondo animado (CSS) -->
+    <div id="animated-bg"></div>
 
-    <!-- Capa principal con efecto glass -->
+    <!-- Capa principal -->
     <div class="rusteze-shell">
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark rusteze-navbar">
@@ -45,7 +45,7 @@
                                          alt="Avatar"
                                          class="user-avatar me-2">
                                     <span class="navbar-text">
-                                        <i class="fas fa-user"></i>
+                                        <i class="fas fa-user me-1"></i>
                                         {{ session.get('user_name', 'Usuario') }}
                                     </span>
                                 </div>
@@ -53,14 +53,14 @@
                             <li class="nav-item">
                                 <a class="nav-link btn btn-sm btn-outline-light px-3 ms-md-2"
                                    href="{{ url_for('auth.logout') }}">
-                                    <i class="fas fa-sign-out-alt"></i> Salir
+                                    <i class="fas fa-sign-out-alt me-1"></i>Salir
                                 </a>
                             </li>
                         {% else %}
                             <li class="nav-item">
                                 <a class="nav-link btn btn-sm btn-outline-light px-3"
                                    href="{{ url_for('auth.login') }}">
-                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                    <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
                                 </a>
                             </li>
                         {% endif %}
@@ -104,30 +104,27 @@
     <!-- JS Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Three.js para fondo Prism -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
-    <script src="{{ url_for('static', filename='js/prismBackground.js') }}"></script>
-
     <!-- JS propio -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 
     <script>
-        window.apiCall = window.apiCall || function() {
+        // Helpers globales
+        window.apiCall = window.apiCall || function () {
             console.warn('apiCall no está definida. Asegúrate de cargar main.js');
             return Promise.reject('apiCall no disponible');
         };
 
-        window.showNotification = window.showNotification || function(message, type) {
+        window.showNotification = window.showNotification || function (message, type) {
             console.log('Notificación:', message, type);
             alert(message);
         };
 
-        window.confirmAction = window.confirmAction || function(message, callback) {
+        window.confirmAction = window.confirmAction || function (message, callback) {
             if (confirm(message)) callback();
         };
 
-        window.formatCurrency = window.formatCurrency || function(amount) {
+        window.formatCurrency = window.formatCurrency || function (amount) {
             return '$' + Number(amount || 0).toLocaleString('es-MX');
         };
     </script>

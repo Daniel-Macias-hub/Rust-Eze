@@ -1,100 +1,328 @@
 {% extends "layouts/base.html" %}
-
 {% block title %}Iniciar Sesión - Rust-Eze{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <!-- Mensajes flash (si no los manejas en base.html, puedes agregarlos aquí) -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="mb-3">
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
+<div class="container">
 
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('auth.login') }}">
-                        <div class="mb-3">
-                            <label for="user_type" class="form-label">Tipo de Usuario</label>
-                            <select class="form-select form-control" id="user_type" name="user_type" required>
-                                <option value="client">Cliente</option>
-                                <option value="admin">Administrador/Empleado</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input 
-                                type="email" 
-                                class="form-control" 
-                                id="email" 
-                                name="email"
-                                placeholder="tu@email.com"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña</label>
-                            <input 
-                                type="password" 
-                                class="form-control" 
-                                id="password" 
-                                name="password"
-                                placeholder="Tu contraseña"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-block">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <div class="mt-3 text-center">
-                        <p class="mb-0">
-                            ¿Eres nuevo cliente? 
-                            <a href="{{ url_for('auth.register') }}">Regístrate aquí</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Información de prueba -->
-            <div class="mt-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6>Credenciales de Prueba:</h6>
-                        <small class="text-muted">
-                            <strong>Admin:</strong> admin@rusteze.com / hashed_password_123<br>
-                            <strong>Cliente:</strong> cliente@ejemplo.com / hashed_password_123
-                        </small>
-                        <p class="mt-2 mb-0">
-                            Estas credenciales corresponden a los registros iniciales que insertaste en
-                            las tablas <code>Empleados</code> y <code>Clientes</code>.
-                        </p>
-                    </div>
-                </div>
-            </div>
+  <!-- ==========================
+       HERO / PRESENTACIÓN
+       ========================== -->
+  <section class="py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6 fade-in">
+        <span class="badge rounded-pill bg-primary bg-gradient px-3 py-2 mb-3">
+          <i class="fas fa-layer-group me-2"></i> Plataforma de gestión automotriz
+        </span>
+
+        <h1 class="display-5 fw-bold text-readable">
+          Rust-Eze Agency
+        </h1>
+
+        <p class="mt-3 text-soft">
+          Rust-Eze es una plataforma web para la gestión integral de una agencia automotriz.
+          Centraliza el control de usuarios, catálogo de vehículos y flujo de ventas,
+          reduciendo errores operativos, mejorando la trazabilidad y facilitando decisiones
+          comerciales mediante una estructura clara por roles.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a href="#login-section" class="btn btn-primary px-4">
+            <i class="fas fa-arrow-down me-2"></i> Ir al inicio de sesión
+          </a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light px-4">
+            <i class="fas fa-user-plus me-2"></i> Crear cuenta de cliente
+          </a>
         </div>
+      </div>
+
+      <div class="col-lg-6 fade-in">
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-star me-2"></i> ¿Qué problema resuelve?
+          </div>
+          <div class="card-body">
+            <ul class="mb-0">
+              <li class="mb-2 text-soft">Evita duplicidad y pérdida de datos en ventas y clientes.</li>
+              <li class="mb-2 text-soft">Establece control por roles para operaciones seguras.</li>
+              <li class="mb-2 text-soft">Organiza el catálogo con estados de disponibilidad claros.</li>
+              <li class="text-soft">Deja trazabilidad para auditoría y control administrativo.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- ==========================
+       FEATURES RÁPIDAS
+       ========================== -->
+  <section class="pb-4">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-users me-2"></i> Gestión de usuarios
+            </h6>
+            <p class="mb-0 text-soft">
+              Clientes y empleados con control de estado, autenticación y permisos.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-car-side me-2"></i> Catálogo inteligente
+            </h6>
+            <p class="mb-0 text-soft">
+              Inventario con imágenes, descripción y estados para ventas reales.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="fw-semibold text-readable">
+              <i class="fas fa-receipt me-2"></i> Ventas auditables
+            </h6>
+            <p class="mb-0 text-soft">
+              Flujo controlado con integridad referencial y soporte de auditoría.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================
+       CRÉDITOS + FUNCIONAMIENTO
+       ========================== -->
+  <section class="py-4">
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-people-group me-2"></i> Créditos del equipo
+          </div>
+          <div class="card-body">
+            <p class="mb-2 text-soft">Desarrolladores del proyecto:</p>
+            <ul class="mb-0">
+              <li class="text-soft"><strong class="text-readable">Macías Matus Jesús Daniel</strong></li>
+              <li class="text-soft"><strong class="text-readable">Pérez Campos Joel Adriel</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-diagram-project me-2"></i> Funcionamiento general
+          </div>
+          <div class="card-body">
+            <p class="mb-0 text-soft">
+              La plataforma organiza la operación por roles:
+              el <strong class="text-readable">cliente</strong> visualiza el catálogo y realiza compras;
+              el <strong class="text-readable">administrador</strong> gestiona clientes, empleados, vehículos y ventas.
+              Cada transacción impacta el inventario y se apoya en validaciones y lógica de base de datos
+              para mantener datos consistentes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================
+       CONTEXTO ACADÉMICO + TECNOLOGÍAS
+       ========================== -->
+  <section class="py-4">
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-graduation-cap me-2"></i> Contexto académico
+          </div>
+          <div class="card-body">
+            <p class="mb-0 text-soft">
+              Proyecto realizado para la materia
+              <strong class="text-readable">“Gestión de Bases de Datos”</strong>,
+              impartida por el profesor
+              <strong class="text-readable">Miguel Ángel Aguilar Cruz</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-code me-2"></i> Tecnologías utilizadas
+          </div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-6">
+                <span class="text-soft"><i class="fab fa-python me-2"></i> Flask (Python)</span>
+              </div>
+              <div class="col-6">
+                <span class="text-soft"><i class="fab fa-html5 me-2"></i> HTML5</span>
+              </div>
+              <div class="col-6">
+                <span class="text-soft"><i class="fab fa-css3-alt me-2"></i> CSS3 / Bootstrap</span>
+              </div>
+              <div class="col-6">
+                <span class="text-soft"><i class="fab fa-js me-2"></i> JavaScript</span>
+              </div>
+              <div class="col-12">
+                <span class="text-soft"><i class="fas fa-database me-2"></i> SQL Server</span>
+              </div>
+            </div>
+            <small class="d-block mt-3 text-muted">
+              Arquitectura por roles, auditoría y procedimientos almacenados para trazabilidad real.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================
+       (OPCIONAL) GRÁFICO FICTICIO
+       ========================== -->
+  <section class="py-4">
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-chart-pie me-2"></i> Distribución simbólica del proyecto
+          </div>
+          <div class="card-body">
+            <canvas id="stackChart" height="180"></canvas>
+            <small class="text-muted d-block mt-2">
+              Datos ilustrativos para presentación del producto.
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-bolt me-2"></i> Valor agregado
+          </div>
+          <div class="card-body">
+            <ul class="mb-0">
+              <li class="mb-2 text-soft">Catálogo con imágenes y estados de inventario.</li>
+              <li class="mb-2 text-soft">Operaciones CRUD administrativas completas.</li>
+              <li class="mb-2 text-soft">Integridad referencial y auditoría de operaciones.</li>
+              <li class="text-soft">Base lista para escalar a un entorno más real.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================
+       LOGIN (BLOQUE FINAL MEJORADO)
+       ========================== -->
+  <section id="login-section" class="login-section">
+    <div class="login-form-card card">
+      <div class="card-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <div class="rainbow-title">Rust-Eze</div>
+            <div class="login-subtitle">Agencia Automotriz · Acceso por roles</div>
+          </div>
+          <span class="badge rounded-pill bg-dark border border-light-subtle px-3 py-2">
+            <i class="fas fa-shield-halved me-2"></i> Área segura
+          </span>
+        </div>
+      </div>
+      <div class="card-body p-4 p-md-5">
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+          <div class="mb-3">
+            <label class="form-label">Tipo de Usuario</label>
+            <select name="user_type" class="form-select form-select-lg">
+              <option value="client" selected>Cliente</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+                   class="form-control form-control-lg"
+                   name="email"
+                   placeholder="tu@email.com"
+                   required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Contraseña</label>
+            <input type="password"
+                   class="form-control form-control-lg"
+                   name="password"
+                   placeholder="Tu contraseña"
+                   required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 btn-login-lg">
+            <i class="fas fa-right-to-bracket me-2"></i> Iniciar Sesión
+          </button>
+
+          <div class="text-center mt-3">
+            <span class="text-soft">¿Eres nuevo cliente?</span>
+            <a href="{{ url_for('auth.register') }}" class="ms-1">
+              Regístrate aquí
+            </a>
+          </div>
+        </form>
+
+        <div class="demo-credentials mt-4">
+          <small class="text-muted d-block mb-2">
+            Si configuraste datos demo en tu BD, estas credenciales pueden ayudarte:
+          </small>
+          <ul class="mb-0">
+            <li class="text-soft"><strong class="text-readable">Admin:</strong> admin@rusteze.com</li>
+            <li class="text-soft"><strong class="text-readable">Cliente:</strong> cliente@ejemplo.com</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js (opcional) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+  // Gráfico simbólico simple (no afecta reglas de negocio)
+  const ctx = document.getElementById('stackChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Frontend', 'Backend', 'Base de datos', 'QA/Auditoría'],
+        datasets: [{
+          data: [38, 32, 22, 8]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: { color: '#e5e7eb' }
+          }
+        }
+      }
+    });
+  }
+</script>
 {% endblock %}

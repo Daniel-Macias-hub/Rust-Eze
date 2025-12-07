@@ -14,6 +14,22 @@
     --glass-bg: rgba(15, 23, 42, 0.78);
     --glass-border: rgba(148, 163, 184, 0.3);
     --glass-card-bg: rgba(15, 23, 42, 0.92);
+
+    --text-strong: #f8fafc;
+    --text-soft: #dbe2ee;
+    --text-muted-strong: #cbd5e1;
+
+    --radius-xl: 1.25rem;
+    --radius-lg: 1rem;
+    --radius-md: 0.75rem;
+
+    --shadow-strong:
+        0 26px 70px rgba(15, 23, 42, 0.99),
+        0 0 60px rgba(59, 130, 246, 0.35);
+
+    --shadow-soft:
+        0 18px 40px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
 }
 
 /* ==========================
@@ -27,9 +43,11 @@
     color: var(--light-color);
     background: radial-gradient(circle at 0% 0%, #111827 0%, #020617 45%, #0b1120 100%);
     overflow-x: hidden;
+    scroll-behavior: smooth;
 }
 
-/* Contenedor del shader Prism (full screen, detrás de todo) */
+/* Contenedor del background animado (si usas Prism/otro) */
+#color-bends-bg,
 #prism-bg {
     position: fixed;
     inset: 0;
@@ -50,6 +68,27 @@
         rgba(17, 24, 39, 0.75),
         rgba(8, 47, 73, 0.65)
     );
+}
+
+/* ==========================
+   UTILIDADES DE TEXTO (LEGIBILIDAD)
+   ========================== */
+
+/* Sobrescribe el muted de Bootstrap en modo oscuro */
+.rusteze-body .text-muted {
+    color: var(--text-muted-strong) !important;
+}
+
+/* Clases utilitarias */
+.text-readable { color: var(--text-strong) !important; }
+.text-soft { color: var(--text-soft) !important; }
+.text-muted-strong { color: var(--text-muted-strong) !important; }
+
+/* Ajuste global para párrafos dentro de cards glass */
+.card p,
+.card li,
+.card small {
+    color: var(--text-soft);
 }
 
 /* ==========================
@@ -81,7 +120,7 @@
     color: #e5e7eb !important;
     margin-left: 12px;
     font-size: 0.85rem;
-    opacity: 0.85;
+    opacity: 0.9;
 }
 
 /* Pill usuario */
@@ -117,9 +156,7 @@
     background: var(--glass-card-bg);
     border-radius: 0.9rem;
     border: 1px solid var(--glass-border);
-    box-shadow:
-        0 18px 40px rgba(15, 23, 42, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
+    box-shadow: var(--shadow-soft);
     color: var(--light-color);
     margin-bottom: 1.25rem;
 }
@@ -225,32 +262,6 @@
 .estado-reservado { color: var(--warning-color); }
 
 /* ==========================
-   LOGIN
-   ========================== */
-
-.login-container {
-    min-height: calc(100vh - 80px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1rem;
-}
-
-.login-card {
-    max-width: 420px;
-    width: 100%;
-    border-radius: 1.25rem;
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    background: radial-gradient(circle at top left,
-        rgba(79, 70, 229, 0.18),
-        rgba(15, 23, 42, 0.95)
-    );
-    box-shadow:
-        0 26px 70px rgba(15, 23, 42, 0.99),
-        0 0 60px rgba(59, 130, 246, 0.5);
-}
-
-/* ==========================
    BOTONES
    ========================== */
 
@@ -325,6 +336,150 @@
 }
 
 /* ==========================
+   LOGIN - PRESENTACIÓN + FORM
+   ========================== */
+
+/* Contenedor de sección final del login */
+.login-section {
+    padding: 3.5rem 0 4.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* Card grande del login */
+.login-form-card {
+    width: 100%;
+    max-width: 560px;
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background:
+        radial-gradient(circle at top left,
+            rgba(79, 70, 229, 0.22),
+            rgba(15, 23, 42, 0.98)
+        );
+    box-shadow: var(--shadow-strong);
+    overflow: hidden;
+}
+
+/* Header del login */
+.login-form-card .card-header {
+    background:
+        linear-gradient(90deg,
+            rgba(79, 70, 229, 0.95),
+            rgba(56, 189, 248, 0.85),
+            rgba(249, 115, 22, 0.85)
+        );
+    border-bottom: 1px solid rgba(148, 163, 184, 0.45);
+    padding: 1rem 1.25rem;
+}
+
+/* Título arcoíris */
+.rainbow-title {
+    font-weight: 900;
+    font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    background-image: linear-gradient(
+        90deg,
+        #ff5c7a,
+        #ff9f1c,
+        #ffe66d,
+        #00ffd1,
+        #00c2ff,
+        #8a5cff,
+        #ff5c7a
+    );
+    background-size: 300% 100%;
+    background-position: 0% 50%;
+
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text; /* para compatibilidad */
+    -webkit-text-fill-color: transparent;
+
+    animation: rainbowShift 6s linear infinite;
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+}
+
+@keyframes rainbowShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+/* Subtítulo del login */
+.login-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted-strong);
+    margin-top: 0.25rem;
+}
+
+/* Inputs grandes */
+.login-form-card .form-label {
+    font-weight: 600;
+    color: var(--text-strong);
+}
+
+.login-form-card .form-control,
+.login-form-card .form-select {
+    border-radius: 0.85rem;
+    background: rgba(2, 6, 23, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: var(--text-strong);
+}
+
+.login-form-card .form-control::placeholder {
+    color: rgba(203, 213, 225, 0.65);
+}
+
+.login-form-card .form-control:focus,
+.login-form-card .form-select:focus {
+    border-color: rgba(99, 102, 241, 0.9);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+/* Botón login grande */
+.btn-login-lg {
+    padding: 0.9rem 1.25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* Caja de credenciales demo */
+.demo-credentials {
+    border-radius: var(--radius-md);
+    border: 1px dashed rgba(148, 163, 184, 0.45);
+    background: rgba(2, 6, 23, 0.25);
+    padding: 1rem 1.1rem;
+    color: var(--text-soft);
+}
+
+/* ==========================
+   LOGIN CONTAINER LEGACY (si alguna vista la usa)
+   ========================== */
+.login-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+}
+
+.login-card {
+    max-width: 520px;
+    width: 100%;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    background: radial-gradient(circle at top left,
+        rgba(79, 70, 229, 0.18),
+        rgba(15, 23, 42, 0.95)
+    );
+    box-shadow: var(--shadow-strong);
+}
+
+/* ==========================
    RESPONSIVE
    ========================== */
 
@@ -333,11 +488,15 @@
         padding: 1.4rem 0 2rem;
     }
 
-    .login-card {
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.98);
-    }
-
     .navbar-brand span {
         font-size: 1rem;
+    }
+
+    .login-section {
+        padding: 2.5rem 0 3.5rem;
+    }
+
+    .login-form-card {
+        max-width: 94vw;
     }
 }
