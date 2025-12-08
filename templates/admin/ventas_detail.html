@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+{% block title %}Detalle de venta #{{ venta.venta_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-3">Detalle de venta #{{ venta.venta_id }}</h1>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <p><strong>Fecha:</strong> {{ venta.fecha_venta }}</p>
+      <p><strong>Total:</strong> ${{ venta.total_venta }}</p>
+      <p><strong>Método de pago:</strong> {{ venta.metodo_pago }}</p>
+      <p><strong>Estado:</strong> {{ venta.estado_venta }}</p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header">Cliente</div>
+    <div class="card-body">
+      <p><strong>Nombre:</strong> {{ venta.cliente }}</p>
+      <p><strong>Email:</strong> {{ venta.cliente_email }}</p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header">Empleado</div>
+    <div class="card-body">
+      <p><strong>Nombre:</strong> {{ venta.empleado }}</p>
+      <p><strong>Email:</strong> {{ venta.empleado_email }}</p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header">Vehículo</div>
+    <div class="card-body">
+      <p><strong>Modelo:</strong> {{ venta.marca }} {{ venta.modelo }} ({{ venta.anio }})</p>
+      <p><strong>Color:</strong> {{ venta.color }}</p>
+      <p><strong>Tipo:</strong> {{ venta.tipo }}</p>
+    </div>
+  </div>
+
+  <a href="{{ url_for('admin.ventas_list') }}" class="btn btn-secondary">
+    Volver al listado de ventas
+  </a>
+</div>
+{% endblock %}

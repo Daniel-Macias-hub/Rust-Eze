@@ -1,124 +1,42 @@
 {% extends "layouts/base.html" %}
+
 {% block title %}Registro de Cliente - Rust-Eze{% endblock %}
 
 {% block content %}
 <div class="container">
 
   <!-- ==========================
-       HERO / PRESENTACIÓN REGISTRO
+       REGISTRO (ÚNICA SECCIÓN)
        ========================== -->
-  <section class="py-5">
-    <div class="row align-items-center g-4">
-      <div class="col-lg-7 fade-in">
-        <span class="badge rounded-pill bg-primary bg-gradient px-3 py-2 mb-3">
-          <i class="fas fa-user-plus me-2"></i> Crear cuenta de cliente
+  <section id="register-section" class="login-section">
+    <div class="login-form-card card login-card-elevated">
+      <div class="card-header login-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="rainbow-title mb-1 login-rainbow-title">RUST-EZE</div>
+          <div class="login-subtitle">Registro de cliente · Acceso al catálogo</div>
+        </div>
+        <span class="badge rounded-pill login-secure-pill px-3 py-2">
+          <i class="fas fa-id-card me-2"></i>😎Nuevo cliente
         </span>
-
-        <h1 class="display-5 fw-bold text-readable mb-3">
-          Únete a <span class="rainbow-title" style="font-size: inherit;">Rust-Eze</span>
-        </h1>
-
-        <p class="text-soft mb-4">
-          Crea tu cuenta para acceder al catálogo de vehículos, revisar tu historial de compras
-          y disfrutar de una experiencia organizada y segura basada en roles y trazabilidad.
-        </p>
-
-        <div class="d-flex flex-wrap gap-2">
-          <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light px-4">
-            <i class="fas fa-right-to-bracket me-2"></i> Ya tengo cuenta
-          </a>
-          <a href="{{ url_for('index') }}" class="btn btn-primary px-4">
-            <i class="fas fa-house me-2"></i> Volver al inicio
-          </a>
-        </div>
-      </div>
-
-      <div class="col-lg-5 fade-in">
-        <div class="card">
-          <div class="card-header">
-            <i class="fas fa-shield-halved me-2"></i> ¿Qué obtienes?
-          </div>
-          <div class="card-body">
-            <ul class="mb-0">
-              <li class="mb-2 text-soft">Acceso al catálogo con estados claros de disponibilidad.</li>
-              <li class="mb-2 text-soft">Flujo de compra respaldado por integridad en base de datos.</li>
-              <li class="mb-2 text-soft">Historial de ventas y trazabilidad de operaciones.</li>
-              <li class="text-soft">Experiencia optimizada para clientes desde el dashboard.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================
-       MICRO FEATURES
-       ========================== -->
-  <section class="pb-4">
-    <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h6 class="fw-semibold text-readable">
-              <i class="fas fa-car-side me-2"></i> Catálogo premium
-            </h6>
-            <p class="mb-0 text-soft">
-              Visualiza vehículos con información clara, precio y estado.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h6 class="fw-semibold text-readable">
-              <i class="fas fa-lock me-2"></i> Acceso seguro
-            </h6>
-            <p class="mb-0 text-soft">
-              Inicio de sesión por rol con control administrativo separado.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h6 class="fw-semibold text-readable">
-              <i class="fas fa-receipt me-2"></i> Historial y control
-            </h6>
-            <p class="mb-0 text-soft">
-              Consulta compras registradas y estados de tus transacciones.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================
-       FORMULARIO REGISTRO (ESTILO PREMIUM)
-       ========================== -->
-  <section class="login-section">
-    <div class="login-form-card card">
-      <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <div>
-            <div class="rainbow-title">Rust-Eze</div>
-            <div class="login-subtitle">Registro de cliente · Acceso al catálogo</div>
-          </div>
-          <span class="badge rounded-pill bg-dark border border-light-subtle px-3 py-2">
-            <i class="fas fa-id-card me-2"></i> Nuevo cliente
-          </span>
-        </div>
       </div>
 
       <div class="card-body p-4 p-md-5">
+
+        {# mensajes flash #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} mb-2">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <form id="registerForm" method="POST" action="{{ url_for('auth.register') }}">
 
           <div class="mb-3">
             <label class="form-label">Nombre completo</label>
             <input type="text"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="nombre_completo"
                    placeholder="Tu nombre y apellidos"
                    required>
@@ -127,49 +45,50 @@
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="email"
                    placeholder="tu@email.com"
                    required>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Teléfono (opcional)</label>
+            <label class="form-label">Teléfono</label>
             <input type="text"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="telefono"
-                   placeholder="Ej. 55 1234 5678">
+                   placeholder="Ej. 55 1234 5678"
+                   required>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Contraseña</label>
             <input id="password"
                    type="password"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="password"
                    placeholder="Crea una contraseña segura"
                    required>
-            <small class="text-muted d-block mt-2">
-              Sugerencia: usa al menos 8 caracteres.
-            </small>
+<small class="password-helper d-block mt-2">
+  Debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial (!@#$%&*).
+</small>
           </div>
 
           <div class="mb-4">
             <label class="form-label">Confirmar contraseña</label>
             <input id="confirmPassword"
                    type="password"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    placeholder="Repite tu contraseña"
                    required>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 btn-login-lg">
+          <button type="submit" class="btn btn-primary w-100 btn-login-lg login-cta-btn">
             <i class="fas fa-user-check me-2"></i> Crear cuenta
           </button>
 
           <div class="text-center mt-3">
             <span class="text-soft">¿Ya tienes cuenta?</span>
-            <a href="{{ url_for('auth.login') }}" class="ms-1">
+            <a href="{{ url_for('auth.login') }}" class="ms-1 link-light fw-semibold small">
               Inicia sesión
             </a>
           </div>
@@ -177,15 +96,15 @@
         </form>
 
         <div class="demo-credentials mt-4">
-          <small class="text-muted d-block mb-2">
+          <small class="demo-helper-text d-block mb-2">
             Tu cuenta se registrará como cliente y quedará lista para comprar vehículos disponibles.
           </small>
           <ul class="mb-0">
             <li class="text-soft">
-              El sistema asigna valores por defecto a documento si tu backend los maneja así.
+              El sistema validará que el correo y el teléfono no estén registrados previamente.
             </li>
             <li class="text-soft">
-              El administrador podrá ver tu registro desde el panel correspondiente.
+              Se exige una contraseña fuerte para proteger tu cuenta.
             </li>
           </ul>
         </div>
@@ -199,19 +118,168 @@
 
 {% block extra_js %}
 <script>
-  // Validación simple de confirmación de contraseña (solo frontend)
-  const form = document.getElementById('registerForm');
-  const pass = document.getElementById('password');
-  const confirmPass = document.getElementById('confirmPassword');
+  // Validación de contraseña fuerte + coincidencia
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('registerForm');
+    const pass = document.getElementById('password');
+    const confirmPass = document.getElementById('confirmPassword');
 
-  if (form && pass && confirmPass) {
-    form.addEventListener('submit', function(e) {
+    if (!form || !pass || !confirmPass) return;
+
+    form.addEventListener('submit', function (e) {
+      const pwd = pass.value || '';
+      const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%&*]).{8,}$/;
+
+      if (!strongRegex.test(pwd)) {
+        e.preventDefault();
+        alert('La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial (!@#$%&*).');
+        pass.focus();
+        return;
+      }
+
       if (pass.value !== confirmPass.value) {
         e.preventDefault();
         alert('Las contraseñas no coinciden.');
         confirmPass.focus();
       }
     });
-  }
+  });
 </script>
+
+<style>
+  /* ==========================
+     MISMO ESTILO QUE EL LOGIN
+     ========================== */
+.password-helper {
+  color: #ffffff;
+  opacity: 0.95;
+}
+
+  .login-form-card {
+    max-width: 720px;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .login-card-elevated {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.9rem;
+  }
+
+  /* Borde animado tipo arcoíris */
+  .login-card-elevated::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: linear-gradient(
+      120deg,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316
+    );
+    background-size: 400% 400%;
+    animation: rainbow-border 14s linear infinite;
+    z-index: -2;
+  }
+
+  .login-card-elevated::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border-radius: inherit;
+    background: rgba(15, 23, 42, 0.98);
+    z-index: -1;
+  }
+
+  @keyframes rainbow-border {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  /* Header con degradado animado */
+  .login-card-header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+    background: linear-gradient(
+      120deg,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316
+    );
+    background-size: 300% 300%;
+    animation: rainbow-header 18s ease infinite;
+    color: #f9fafb;
+  }
+
+  @keyframes rainbow-header {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  .login-secure-pill {
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(248, 250, 252, 0.35);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .login-rainbow-title {
+    font-size: 1.7rem;
+    letter-spacing: 0.12em;
+  }
+
+  .login-card-elevated .form-control-lg,
+  .login-card-elevated .form-select-lg {
+    padding: 1rem 1.15rem;
+    font-size: 1.02rem;
+    border-radius: 0.9rem;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+  }
+
+  .login-card-elevated .form-control-lg:focus,
+  .login-card-elevated .form-select-lg:focus {
+    box-shadow:
+      0 0 0 0.14rem rgba(56, 189, 248, 0.45),
+      0 16px 32px rgba(15, 23, 42, 0.95);
+  }
+
+  .login-cta-btn {
+    position: relative;
+    overflow: hidden;
+    font-size: 1.05rem;
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
+  }
+
+  .login-cta-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 10% 0%, rgba(251, 191, 36, 0.32), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+  }
+
+  .login-cta-btn:hover::after {
+    opacity: 1;
+  }
+
+  /* Texto informativo un poco más claro */
+  .demo-helper-text {
+    color: #cbd5ff;
+  }
+</style>
 {% endblock %}

@@ -6,7 +6,9 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Catálogo de Vehículos</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <span class="badge bg-primary fs-6">{{ vehiculos|length }} vehículos disponibles</span>
+        <span id="catalogoCount" class="badge bg-primary fs-6">
+            {{ vehiculos|length }} vehículos disponibles
+        </span>
     </div>
 </div>
 
@@ -35,23 +37,15 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Precio Mínimo</label>
-                <input type="number" class="form-control" name="precio_min" placeholder="0" onchange="aplicarFiltros()">
+                <input type="number" class="form-control" name="precio_min" placeholder="0"
+                       onchange="aplicarFiltros()">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Precio Máximo</label>
-                <input type="number" class="form-control" name="precio_max" placeholder="1000000" onchange="aplicarFiltros()">
+                <input type="number" class="form-control" name="precio_max" placeholder="1000000"
+                       onchange="aplicarFiltros()">
             </div>
         </form>
-    </div>
-</div>
-
-<!-- En cada card de vehículo, agregar este botón: -->
-<div class="card-footer bg-transparent">
-    <div class="d-grid">
-        <a href="{{ url_for('client.comprar_vehiculo', vehiculo_id=vehiculo.vehiculo_id) }}" 
-           class="btn btn-success">
-            <i class="fas fa-shopping-cart"></i> Comprar Ahora
-        </a>
     </div>
 </div>
 
@@ -64,36 +58,65 @@
              data-tipo="{{ vehiculo.tipo|lower }}"
              data-precio="{{ vehiculo.precio }}">
             <div class="card vehicle-card h-100">
+
                 {% if vehiculo.imagen_url %}
-                <img src="{{ vehiculo.imagen_url }}" class="card-img-top vehicle-img" 
-                     alt="{{ vehiculo.marca }} {{ vehiculo.modelo }}">
+                <img src="{{ vehiculo.imagen_url }}"
+                     class="card-img-top vehicle-img"
+                     alt="{{ vehiculo.marca }} {{ vehiculo.modelo }}"
+                     style="height: 220px; object-fit: cover;">
                 {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
                     <i class="fas fa-car fa-3x text-muted"></i>
                 </div>
                 {% endif %}
+
                 <div class="card-body">
                     <h5 class="card-title">{{ vehiculo.marca }} {{ vehiculo.modelo }}</h5>
-                    <p class="card-text text-muted">{{ vehiculo.anio }} • {{ vehiculo.color }} • {{ vehiculo.tipo }}</p>
-                    <p class="card-text">{{ vehiculo.descripcion or 'Vehículo en excelentes condiciones.' }}</p>
-                    
+                    <p class="card-text text-muted">
+                        {{ vehiculo.anio }} • {{ vehiculo.color }} • {{ vehiculo.tipo }}
+                    </p>
+                    <p class="card-text">
+                        {{ vehiculo.descripcion or 'Vehículo en excelentes condiciones.' }}
+                    </p>
+
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="price-tag">${{ "{:,.2f}".format(vehiculo.precio) }}</span>
-                        <span class="badge bg-success">Disponible</span>
+                        <span class="price-tag">
+                            ${{ "{:,.2f}".format(vehiculo.precio) }}
+                        </span>
+                        <span class="badge
+                            {% if vehiculo.estado_disponibilidad == 'Disponible' %}bg-success
+                            {% elif vehiculo.estado_disponibilidad == 'Reservado' %}bg-warning text-dark
+                            {% elif vehiculo.estado_disponibilidad == 'Vendido' %}bg-secondary
+                            {% else %}bg-dark{% endif %}">
+                            {{ vehiculo.estado_disponibilidad }}
+                        </span>
                     </div>
                 </div>
+
                 <div class="card-footer bg-transparent">
-                    <div class="btn-group w-100">
-                        <button class="btn btn-outline-primary" 
-                             onclick="solicitarTestDrive('{{ vehiculo.vehiculo_id }}')">
+                    <div class="btn-group w-100 mb-2">
+                        <button class="btn btn-outline-primary"
+                                onclick="solicitarTestDrive('{{ vehiculo.vehiculo_id }}')">
                             <i class="fas fa-calendar me-1"></i>Test Drive
                         </button>
-                        <button class="btn btn-primary" 
-                             onclick="contactarPorVehiculo('{{ vehiculo.vehiculo_id }}')">
+                        <button class="btn btn-primary"
+                                onclick="contactarPorVehiculo('{{ vehiculo.vehiculo_id }}')">
                             <i class="fas fa-info-circle me-1"></i>Más Info
                         </button>
                     </div>
+
+                    <!-- Botón de compra (POST a client.comprar) -->
+                    <form method="POST"
+                          action="{{ url_for('client.comprar', vehiculo_id=vehiculo.vehiculo_id) }}"
+                          class="d-grid">
+                        <button type="submit"
+                                class="btn btn-success"
+                                {% if vehiculo.estado_disponibilidad != 'Disponible' %}disabled{% endif %}>
+                            <i class="fas fa-shopping-cart"></i> Comprar Ahora
+                        </button>
+                    </form>
                 </div>
+
             </div>
         </div>
         {% endfor %}
@@ -145,7 +168,7 @@ function aplicarFiltros() {
     });
 
     // Actualizar contador
-    const badge = document.querySelector('.badge');
+    const badge = document.getElementById('catalogoCount');
     if (badge) {
         badge.textContent = visibleCount + ' vehículos disponibles';
     }
@@ -153,9 +176,10 @@ function aplicarFiltros() {
 
 // @ts-ignore
 function solicitarTestDrive(vehiculoId) {
-    // Convertir a número si es necesario
     const id = parseInt(vehiculoId);
-    const fecha = prompt(`¿Para qué fecha le gustaría programar el test drive para el vehículo ID ${id}? (YYYY-MM-DD)`);
+    const fecha = prompt(
+        `¿Para qué fecha le gustaría programar el test drive para el vehículo ID ${id}? (YYYY-MM-DD)`
+    );
     if (fecha) {
         if (typeof showNotification === 'function') {
             showNotification(`📅 Test drive solicitado para vehículo ${id} - ${fecha}`, 'info');
@@ -171,7 +195,10 @@ function contactarPorVehiculo(vehiculoId) {
     if (typeof showNotification === 'function') {
         showNotification(`📞 Conectando con asesor para vehículo ${id}...`, 'info');
         setTimeout(() => {
-            showNotification(`✅ Un asesor se contactará con usted pronto sobre el vehículo ${id}`, 'success');
+            showNotification(
+                `✅ Un asesor se contactará con usted pronto sobre el vehículo ${id}`,
+                'success'
+            );
         }, 1500);
     } else {
         alert(`📞 Conectando con asesor para vehículo ${id}...`);

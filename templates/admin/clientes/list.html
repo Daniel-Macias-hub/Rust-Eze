@@ -29,7 +29,8 @@
             </button>
         </form>
 
-        <a href="{{ url_for('admin.clientes_new') }}"
+        <!-- Botón correcto al endpoint clientes_nuevo -->
+        <a href="{{ url_for('admin.clientes_nuevo') }}"
            class="btn btn-primary btn-sm">
             <i class="fa-solid fa-user-plus me-1"></i> Nuevo cliente
         </a>
@@ -71,14 +72,16 @@
                                 {% endif %}
                             </td>
                             <td class="text-end">
+                                <!-- Editar: endpoint correcto clientes_editar -->
                                 <a class="btn btn-outline-light btn-sm"
-                                   href="{{ url_for('admin.clientes_edit', cliente_id=c.cliente_id) }}">
+                                   href="{{ url_for('admin.clientes_editar', cliente_id=c.cliente_id) }}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
 
+                                <!-- Eliminar (baja lógica): endpoint correcto clientes_eliminar -->
                                 <form class="d-inline"
                                       method="POST"
-                                      action="{{ url_for('admin.clientes_delete', cliente_id=c.cliente_id) }}">
+                                      action="{{ url_for('admin.clientes_eliminar', cliente_id=c.cliente_id) }}">
                                     <button type="button"
                                             class="btn btn-outline-danger btn-sm"
                                             onclick="confirmAction('¿Eliminar este cliente?', () => this.closest('form').submit())">

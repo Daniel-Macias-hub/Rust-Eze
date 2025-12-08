@@ -36,7 +36,7 @@
       </div>
 
       <div class="col-lg-6 fade-in">
-        <div class="card">
+        <div class="card rainbow-card">
           <div class="card-header">
             <i class="fas fa-star me-2"></i> ¿Qué problema resuelve?
           </div>
@@ -59,7 +59,7 @@
   <section class="pb-4">
     <div class="row g-3">
       <div class="col-md-4">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-body">
             <h6 class="fw-semibold text-readable">
               <i class="fas fa-users me-2"></i> Gestión de usuarios
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-body">
             <h6 class="fw-semibold text-readable">
               <i class="fas fa-car-side me-2"></i> Catálogo inteligente
@@ -83,7 +83,7 @@
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-body">
             <h6 class="fw-semibold text-readable">
               <i class="fas fa-receipt me-2"></i> Ventas auditables
@@ -103,7 +103,7 @@
   <section class="py-4">
     <div class="row g-3">
       <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-header">
             <i class="fas fa-people-group me-2"></i> Créditos del equipo
           </div>
@@ -118,7 +118,7 @@
       </div>
 
       <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-header">
             <i class="fas fa-diagram-project me-2"></i> Funcionamiento general
           </div>
@@ -142,7 +142,7 @@
   <section class="py-4">
     <div class="row g-3">
       <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-header">
             <i class="fas fa-graduation-cap me-2"></i> Contexto académico
           </div>
@@ -158,7 +158,7 @@
       </div>
 
       <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card h-100 rainbow-card">
           <div class="card-header">
             <i class="fas fa-code me-2"></i> Tecnologías utilizadas
           </div>
@@ -190,63 +190,84 @@
   </section>
 
   <!-- ==========================
-       (OPCIONAL) GRÁFICO FICTICIO
+       GRÁFICO + VALOR AGREGADO
        ========================== -->
   <section class="py-4">
-    <div class="row g-3">
+    <div class="row g-3 align-items-stretch">
+      <!-- Gráfico donut -->
       <div class="col-lg-6">
-        <div class="card h-100">
-          <div class="card-header">
-            <i class="fas fa-chart-pie me-2"></i> Distribución simbólica del proyecto
+        <div class="card shadow-sm h-100 animated-card rainbow-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+              <i class="fa-solid fa-chart-pie me-2"></i>
+              Distribución simbólica del proyecto
+            </span>
+            <small class="text-muted">Tecnologías usadas</small>
           </div>
-          <div class="card-body">
-            <canvas id="stackChart" height="180"></canvas>
-            <small class="text-muted d-block mt-2">
-              Datos ilustrativos para presentación del producto.
+          <div class="card-body d-flex flex-column justify-content-center">
+            <div style="position: relative; height: 260px;">
+              <canvas id="projectDistributionChart"></canvas>
+            </div>
+            <small class="text-muted d-block mt-2 text-center">
+              Datos ilustrativos basados en la composición del repositorio.
             </small>
           </div>
         </div>
       </div>
+
+      <!-- Valor agregado -->
       <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card shadow-sm h-100 animated-card rainbow-card">
           <div class="card-header">
-            <i class="fas fa-bolt me-2"></i> Valor agregado
+            <i class="fa-solid fa-bolt me-2"></i>
+            Valor agregado
           </div>
-          <div class="card-body">
-            <ul class="mb-0">
-              <li class="mb-2 text-soft">Catálogo con imágenes y estados de inventario.</li>
-              <li class="mb-2 text-soft">Operaciones CRUD administrativas completas.</li>
-              <li class="mb-2 text-soft">Integridad referencial y auditoría de operaciones.</li>
-              <li class="text-soft">Base lista para escalar a un entorno más real.</li>
+          <div class="card-body d-flex flex-column justify-content-center">
+            <ul class="list-unstyled mb-0 feature-list">
+              <li class="mb-3 feature-item">
+                <i class="fa-solid fa-circle-check text-success me-2"></i>
+                Catálogo con imágenes y estados de inventario en tiempo real.
+              </li>
+              <li class="mb-3 feature-item">
+                <i class="fa-solid fa-circle-check text-success me-2"></i>
+                Operaciones CRUD administrativas completas para vehículos, clientes y empleados.
+              </li>
+              <li class="mb-3 feature-item">
+                <i class="fa-solid fa-circle-check text-success me-2"></i>
+                Integridad referencial y auditoría de ventas y movimientos clave.
+              </li>
+              <li class="mb-0 feature-item">
+                <i class="fa-solid fa-circle-check text-success me-2"></i>
+                Base lista para escalar: reportes, dashboards y funcionalidades avanzadas.
+              </li>
             </ul>
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
   <!-- ==========================
-       LOGIN (BLOQUE FINAL MEJORADO)
+       LOGIN (BLOQUE FINAL)
        ========================== -->
   <section id="login-section" class="login-section">
-    <div class="login-form-card card">
-      <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <div>
-            <div class="rainbow-title">Rust-Eze</div>
-            <div class="login-subtitle">Agencia Automotriz · Acceso por roles</div>
-          </div>
-          <span class="badge rounded-pill bg-dark border border-light-subtle px-3 py-2">
-            <i class="fas fa-shield-halved me-2"></i> Área segura
-          </span>
+    <div class="login-form-card card login-card-elevated">
+      <div class="card-header login-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="rainbow-title mb-1 login-rainbow-title">RUST-EZE</div>
+          <div class="login-subtitle">Agencia Automotriz · Acceso por roles</div>
         </div>
+        <span class="badge rounded-pill login-secure-pill px-3 py-2">
+          <i class="fas fa-shield-halved me-2"></i> Área segura
+        </span>
       </div>
       <div class="card-body p-4 p-md-5">
 
         <form method="POST" action="{{ url_for('auth.login') }}">
           <div class="mb-3">
             <label class="form-label">Tipo de Usuario</label>
-            <select name="user_type" class="form-select form-select-lg">
+            <select name="user_type" class="form-select form-select-lg input-elevated">
               <option value="client" selected>Cliente</option>
               <option value="admin">Administrador</option>
             </select>
@@ -255,7 +276,7 @@
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="email"
                    placeholder="tu@email.com"
                    required>
@@ -264,31 +285,32 @@
           <div class="mb-4">
             <label class="form-label">Contraseña</label>
             <input type="password"
-                   class="form-control form-control-lg"
+                   class="form-control form-control-lg input-elevated"
                    name="password"
                    placeholder="Tu contraseña"
                    required>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 btn-login-lg">
-            <i class="fas fa-right-to-bracket me-2"></i> Iniciar Sesión
+          <button type="submit" class="btn btn-primary w-100 btn-login-lg login-cta-btn">
+            <span class="me-1"><i class="fas fa-right-to-bracket"></i></span>
+            Iniciar Sesión
           </button>
 
           <div class="text-center mt-3">
             <span class="text-soft">¿Eres nuevo cliente?</span>
-            <a href="{{ url_for('auth.register') }}" class="ms-1">
+            <a href="{{ url_for('auth.register') }}" class="ms-1 link-light fw-semibold small">
               Regístrate aquí
             </a>
           </div>
         </form>
 
         <div class="demo-credentials mt-4">
-          <small class="text-muted d-block mb-2">
+          <small class="d-block mb-2 demo-helper-text">
             Si configuraste datos demo en tu BD, estas credenciales pueden ayudarte:
           </small>
           <ul class="mb-0">
-            <li class="text-soft"><strong class="text-readable">Admin:</strong> admin@rusteze.com</li>
-            <li class="text-soft"><strong class="text-readable">Cliente:</strong> cliente@ejemplo.com</li>
+            <li class="text-soft demo-cred-item"><strong class="text-readable">Admin:</strong> admin@rusteze.com</li>
+            <li class="text-soft demo-cred-item"><strong class="text-readable">Cliente:</strong> cliente@ejemplo.com</li>
           </ul>
         </div>
 
@@ -299,30 +321,320 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Chart.js (opcional) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-  // Gráfico simbólico simple (no afecta reglas de negocio)
-  const ctx = document.getElementById('stackChart');
-  if (ctx) {
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Frontend', 'Backend', 'Base de datos', 'QA/Auditoría'],
+  document.addEventListener('DOMContentLoaded', function () {
+    const cards = Array.from(document.querySelectorAll('.animated-card'));
+    const features = Array.from(document.querySelectorAll('.feature-item'));
+
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add('animate');
+      }, 150 * index);
+    });
+
+    features.forEach((item, index) => {
+      setTimeout(() => {
+        item.classList.add('animate');
+      }, 400 + 100 * index);
+    });
+
+    const ctx = document.getElementById('projectDistributionChart');
+    if (ctx) {
+      const data = {
+        labels: ['HTML 67.7%', 'Python 19.2%', 'JavaScript 7.7%', 'CSS 5.4%'],
         datasets: [{
-          data: [38, 32, 22, 8]
+          data: [67.7, 19.2, 7.7, 5.4],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.9)',
+            'rgba(54, 162, 235, 0.9)',
+            'rgba(255, 206, 86, 0.9)',
+            'rgba(153, 102, 255, 0.9)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)'
+          ],
+          borderWidth: 2,
+          hoverOffset: 8
         }]
-      },
-      options: {
+      };
+
+      const options = {
         responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
         plugins: {
           legend: {
-            labels: { color: '#e5e7eb' }
+            position: 'top',
+            labels: {
+              color: '#e5e5f0',
+              boxWidth: 18
+            }
           }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1100,
+          easing: 'easeOutQuart'
         }
-      }
-    });
-  }
+      };
+
+      // eslint-disable-next-line no-unused-vars
+      const projectChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: options
+      });
+    }
+  });
 </script>
+
+<style>
+  /* Estado base para animaciones de entrada */
+  .animated-card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feature-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .animated-card.animate {
+    animation: fadeInUpCard 0.6s ease-out forwards;
+  }
+
+  .feature-item.animate {
+    animation: fadeInUpItem 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeInUpCard {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUpItem {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animated-card .card-body {
+    min-height: 260px;
+  }
+
+  /* ==========================
+     TARJETAS CON BORDE ARCOIRIS
+     ========================== */
+
+  .rainbow-card {
+    position: relative;
+    border-radius: 1.3rem;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    transition:
+      transform 0.22s ease-out,
+      box-shadow 0.22s ease-out,
+      border-color 0.22s ease-out;
+  }
+
+  .rainbow-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(
+      120deg,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316
+    );
+    background-size: 320% 320%;
+    opacity: 0;
+    z-index: -1;
+    animation: rainbow-card 18s linear infinite;
+    transition: opacity 0.25s ease-out;
+  }
+
+  .rainbow-card > .card-header,
+  .rainbow-card > .card-body {
+    position: relative;
+    z-index: 1;
+  }
+
+  .rainbow-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 24px 40px rgba(15, 23, 42, 0.85),
+      0 0 0 1px rgba(15, 23, 42, 0.9);
+    border-color: rgba(96, 165, 250, 0.8);
+  }
+
+  .rainbow-card:hover::before {
+    opacity: 1;
+  }
+
+  @keyframes rainbow-card {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  /* Hover genérico para cualquier card excepto la de login
+     (por si hay otras tarjetas sin clase rainbow-card) */
+  .card:not(.login-form-card):hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 20px 32px rgba(15, 23, 42, 0.8),
+      0 0 0 1px rgba(15, 23, 42, 0.9);
+  }
+
+  /* ==========================
+     LOGIN MÁS GRANDE + ARCOIRIS
+     ========================== */
+
+  .login-form-card {
+    max-width: 720px;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .login-card-elevated {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.9rem;
+  }
+
+  .login-card-elevated::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: linear-gradient(
+      120deg,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316
+    );
+    background-size: 400% 400%;
+    animation: rainbow-border 14s linear infinite;
+    z-index: -2;
+  }
+
+  .login-card-elevated::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border-radius: inherit;
+    background: rgba(15, 23, 42, 0.98);
+    z-index: -1;
+  }
+
+  @keyframes rainbow-border {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  .login-card-header {
+    border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+    background: linear-gradient(
+      120deg,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316
+    );
+    background-size: 300% 300%;
+    animation: rainbow-header 18s ease infinite;
+    color: #f9fafb;
+  }
+
+  @keyframes rainbow-header {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  .login-secure-pill {
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(248, 250, 252, 0.35);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .login-rainbow-title {
+    font-size: 1.7rem;
+    letter-spacing: 0.12em;
+  }
+
+  .login-card-elevated .form-control-lg,
+  .login-card-elevated .form-select-lg {
+    padding: 1rem 1.15rem;
+    font-size: 1.02rem;
+    border-radius: 0.9rem;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    transition: box-shadow 0.18s ease-out, transform 0.18s ease-out;
+  }
+
+  .login-card-elevated .form-control-lg:focus,
+  .login-card-elevated .form-select-lg:focus {
+    box-shadow:
+      0 0 0 0.14rem rgba(56, 189, 248, 0.45),
+      0 16px 32px rgba(15, 23, 42, 0.95);
+    transform: translateY(-1px);
+  }
+
+  .login-cta-btn {
+    position: relative;
+    overflow: hidden;
+    font-size: 1.05rem;
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
+  }
+
+  .login-cta-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 10% 0%, rgba(251, 191, 36, 0.32), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+  }
+
+  .login-cta-btn:hover::after {
+    opacity: 1;
+  }
+
+  /* ==========================
+     DEMO CREDENTIALS (TEXTO MÁS CLARO)
+     ========================== */
+
+  .demo-credentials .demo-helper-text {
+    color: #e5e7eb; /* mucho más claro que text-muted */
+  }
+
+  .demo-credentials .demo-cred-item {
+    color: #d1d5db;
+  }
+</style>
 {% endblock %}

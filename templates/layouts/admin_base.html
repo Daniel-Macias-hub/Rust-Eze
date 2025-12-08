@@ -61,12 +61,7 @@
                                 <i class="fas fa-car me-2"></i>Catálogo
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'client.historial_compras' %}active{% endif %}" 
-                               href="{{ url_for('client.historial_compras') }}">
-                                <i class="fas fa-history me-2"></i>Mis Compras
-                            </a>
-                        </li>
+                        <!-- Se elimina el enlace a historial de compras -->
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'client.perfil' %}active{% endif %}" 
                                href="{{ url_for('client.perfil') }}">
@@ -89,3 +84,35 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
+# -------------------------------------------------------------------
+# Perfil de cliente
+# -------------------------------------------------------------------
+@client_bp.route("/perfil")
+def perfil():
+    cliente_id = session.get("user_id")
+    if not cliente_id:
+        return redirect(url_for("auth.login"))
+
+    filas = execute_query("""
+        SELECT 
+            cliente_id,
+            nombre_completo,
+            email,
+            telefono,
+            direccion,
+            fecha_registro
+        FROM Clientes
+        WHERE cliente_id = ?
+    """, (cliente_id,))
+
+    if not filas:
+        flash("No se encontró información del cliente.", "warning")
+        return redirect(url_for("client.dashboard"))
+
+    cliente = filas[0]
+
+    return render_template(
+        "client/perfil.html",
+        cliente=cliente
+    )

@@ -29,7 +29,7 @@
             </button>
         </form>
 
-        <a href="{{ url_for('admin.empleados_new') }}"
+        <a href="{{ url_for('admin.empleados_nuevo') }}"
            class="btn btn-primary btn-sm">
             <i class="fa-solid fa-user-plus me-1"></i> Nuevo empleado
         </a>
@@ -78,13 +78,13 @@
                             </td>
                             <td class="text-end">
                                 <a class="btn btn-outline-light btn-sm"
-                                   href="{{ url_for('admin.empleados_edit', empleado_id=e.empleado_id) }}">
+                                   href="{{ url_for('admin.empleados_editar', empleado_id=e.empleado_id) }}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
 
                                 <form class="d-inline"
                                       method="POST"
-                                      action="{{ url_for('admin.empleados_delete', empleado_id=e.empleado_id) }}">
+                                      action="{{ url_for('admin.empleados_eliminar', empleado_id=e.empleado_id) }}">
                                     <button type="button"
                                             class="btn btn-outline-danger btn-sm"
                                             onclick="confirmAction('¿Eliminar este empleado?', () => this.closest('form').submit())">

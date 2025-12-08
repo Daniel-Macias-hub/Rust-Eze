@@ -1,132 +1,351 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Rust-Eze - Calidad, antes que cantidad{% endblock %}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap / Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <title>{% block title %}Rust-Eze{% endblock %}</title>
 
-    <!-- Estilos propios -->
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
-    {% block extra_css %}{% endblock %}
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkY3A2ZCkR7gcKdqY6ZkXBT4Ck5i7q0r5Vh9ZC2R0EYBLET2lK7H3r0JQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    /* Fondo un poco más claro con brillos */
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.20) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.26) 0, transparent 55%),
+        linear-gradient(to bottom, #0b1220, #020617);
+      color: #e5e7eb;
+    }
+
+    .rusteze-body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .text-readable {
+      color: #f9fafb;
+    }
+
+    .text-soft {
+      color: #9ca3af;
+    }
+
+    .login-section {
+      padding: 2rem 0 3rem 0;
+    }
+
+    .login-form-card {
+      max-width: 520px;
+      margin: 0 auto;
+      border-radius: 1.5rem;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow:
+        0 20px 25px -5px rgba(15, 23, 42, 0.6),
+        0 10px 10px -5px rgba(15, 23, 42, 0.4);
+    }
+
+    .btn-login-lg {
+      padding-top: 0.8rem;
+      padding-bottom: 0.8rem;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 999px;
+    }
+
+    .rainbow-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #f97316, #eab308, #22c55e, #06b6d4, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .login-subtitle {
+      font-size: 0.95rem;
+      color: #9ca3af;
+    }
+
+    /* NAVBAR + LOGO MÁS GRANDE */
+    .navbar-brand {
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .navbar-brand span {
+      color: #facc15;
+    }
+
+    .brand-logo {
+      height: 44px;           /* aquí haces el logo más grande */
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(0,0,0,0.4));
+    }
+
+    .brand-text {
+      font-size: 1rem;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1rem 0;
+      background: rgba(15, 23, 42, 0.96);
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+
+    .rusteze-card {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 1.3rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 2rem 2.2rem;
+      box-shadow:
+        0 24px 38px rgba(15, 23, 42, 0.8),
+        0 9px 46px rgba(15, 23, 42, 0.7);
+    }
+
+    .rusteze-card h2 {
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.98);
+      border-color: rgba(148, 163, 184, 0.35);
+      color: #e5e7eb;
+    }
+
+    .card-header {
+      border-bottom-color: rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      font-weight: 500;
+    }
+
+    .badge.bg-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ec4899, #f97316);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #db2777, #ea580c);
+    }
+
+    .btn-outline-light {
+      border-radius: 999px;
+    }
+
+    /* ==========================
+       ANIMACIONES GENERALES
+       ========================== */
+
+    .animated-card {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .animated-card.animate {
+      animation: fadeInUpCard 0.6s ease-out forwards;
+    }
+
+    .feature-item.animate {
+      animation: fadeInUpItem 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeInUpCard {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUpItem {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animated-card .card-body {
+      min-height: 260px;
+    }
+
+    /* ==========================
+       TARJETAS CON BORDE ARCOIRIS
+       ========================== */
+
+    .rainbow-card {
+      position: relative;
+      border-radius: 1.4rem;
+      border: none;
+      background: transparent;
+      overflow: hidden;
+      box-shadow:
+        0 18px 30px rgba(15, 23, 42, 0.7),
+        0 0 0 1px rgba(15, 23, 42, 0.7);
+    }
+
+    .rainbow-card::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: inherit;
+      background: linear-gradient(
+        120deg,
+        #f97316,
+        #eab308,
+        #22c55e,
+        #06b6d4,
+        #6366f1,
+        #ec4899,
+        #f97316
+      );
+      background-size: 380% 380%;
+      animation: rainbow-border-soft 18s linear infinite;
+      z-index: -2;
+    }
+
+    .rainbow-card::after {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: inherit;
+      background: rgba(15, 23, 42, 0.97);
+      z-index: -1;
+    }
+
+    @keyframes rainbow-border-soft {
+      0%   { background-position:   0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position:   0% 50%; }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
 </head>
-<body class="rusteze-body">
-    <!-- Fondo animado (CSS) -->
-    <div id="animated-bg"></div>
+<body>
+<div class="rusteze-body">
 
-    <!-- Capa principal -->
-    <div class="rusteze-shell">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark rusteze-navbar">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                    <img src="{{ url_for('static', filename='images/logo_rusteze.png') }}"
-                         alt="Rust-Eze" class="rusteze-logo me-2">
-                    <span>Rust-Eze</span>
-                </a>
-                <span class="navbar-text slogan d-none d-md-inline">
-                    Calidad, antes que cantidad
-                </span>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <!-- Ajusta la ruta del logo a tu imagen real -->
+        <img src="{{ url_for('static', filename='images/branding/rusteze-logo.png') }}"
+             alt="Rust-Eze"
+             class="brand-logo">
+        <span class="brand-text d-none d-sm-inline">RUST-<span>EZE</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+              aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        {% if session.get('user_id') %}
-                            <li class="nav-item me-2 d-none d-md-block">
-                                <div class="d-flex align-items-center user-pill">
-                                    <img src="{{ url_for('static', filename='images/avatars/admin.png') }}"
-                                         onerror="this.style.display='none';"
-                                         alt="Avatar"
-                                         class="user-avatar me-2">
-                                    <span class="navbar-text">
-                                        <i class="fas fa-user me-1"></i>
-                                        {{ session.get('user_name', 'Usuario') }}
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-sm btn-outline-light px-3 ms-md-2"
-                                   href="{{ url_for('auth.logout') }}">
-                                    <i class="fas fa-sign-out-alt me-1"></i>Salir
-                                </a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-sm btn-outline-light px-3"
-                                   href="{{ url_for('auth.login') }}">
-                                    <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
+          {% if current_user is defined and current_user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle me-1"></i>
+                {{ current_user.nombre if current_user.nombre is defined else current_user.email }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li>
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-gauge-high me-2"></i>Panel
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') if 'auth.logout' in current_app.view_functions else '#' }}">
+                    <i class="fas fa-right-from-bracket me-2"></i>Cerrar sesión
+                  </a>
+                </li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">
+                <i class="fas fa-right-to-bracket me-1"></i> Iniciar sesión
+              </a>
+            </li>
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-outline-light btn-sm px-3" href="{{ url_for('auth.register') }}">
+                <i class="fas fa-user-plus me-1"></i> Registrarse
+              </a>
+            </li>
+          {% endif %}
 
-        <!-- Mensajes Flash -->
-        <div class="container mt-3">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show glass-alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
-
-        <!-- Contenido Principal -->
-        <main class="rusteze-main">
-            {% block content %}{% endblock %}
-        </main>
-
-        <!-- Footer -->
-        <footer class="rusteze-footer">
-            <div class="container text-center">
-                <p class="mb-1">&copy; 2025 Rust-Eze Agency. Todos los derechos reservados.</p>
-                <p class="mb-0 footer-quote">
-                    <i class="fas fa-quote-left me-2"></i>
-                    Calidad, antes que cantidad
-                    <i class="fas fa-quote-right ms-2"></i>
-                </p>
-            </div>
-        </footer>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <!-- JS Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- CONTENIDO -->
+  <main class="flex-fill">
+    {% block content %}{% endblock %}
+  </main>
 
-    <!-- JS propio -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block extra_js %}{% endblock %}
+  <!-- FOOTER -->
+  <footer>
+    <div class="container text-center">
+      Rust-Eze · Agencia Automotriz — Proyecto académico · {{ 2025 }}
+    </div>
+  </footer>
 
-    <script>
-        // Helpers globales
-        window.apiCall = window.apiCall || function () {
-            console.warn('apiCall no está definida. Asegúrate de cargar main.js');
-            return Promise.reject('apiCall no disponible');
-        };
+</div>
 
-        window.showNotification = window.showNotification || function (message, type) {
-            console.log('Notificación:', message, type);
-            alert(message);
-        };
+<!-- Bootstrap JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+  crossorigin="anonymous"
+></script>
 
-        window.confirmAction = window.confirmAction || function (message, callback) {
-            if (confirm(message)) callback();
-        };
-
-        window.formatCurrency = window.formatCurrency || function (amount) {
-            return '$' + Number(amount || 0).toLocaleString('es-MX');
-        };
-    </script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

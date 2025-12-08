@@ -1,3 +1,5 @@
+import re
+
 # auth/routes.py
 from flask import (
     Blueprint,
@@ -11,7 +13,23 @@ from flask import (
 from utils.database import execute_query  # Asegúrate de que existe esta función
 
 auth_bp = Blueprint("auth", __name__)  # nombre = 'auth'
-
+def is_strong_password(pwd: str) -> bool:
+    """
+    Regla:
+    - Al menos 8 caracteres
+    - Al menos una mayúscula
+    - Al menos un número
+    - Al menos un carácter especial de !@#$%&*
+    """
+    if len(pwd) < 8:
+        return False
+    if not re.search(r"[A-Z]", pwd):
+        return False
+    if not re.search(r"[0-9]", pwd):
+        return False
+    if not re.search(r"[!@#$%&*]", pwd):
+        return False
+    return True
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -112,33 +130,74 @@ def login():
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        nombre = request.form.get("nombre_completo")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        telefono = request.form.get("telefono")
+        nombre = (request.form.get("nombre_completo") or "").strip()
+        email = (request.form.get("email") or "").strip().lower()
+        password = (request.form.get("password") or "").strip()
+        telefono = (request.form.get("telefono") or "").strip()
 
-        if not all([nombre, email, password]):
-            flash("Por favor completa todos los campos requeridos.", "danger")
+        # 1) Validaciones básicas
+        if not nombre or not email or not password or not telefono:
+            flash("Por favor completa todos los campos obligatorios.", "danger")
+            return render_template("auth/register.html")
+
+        # 2) Validar contraseña fuerte
+        if not is_strong_password(password):
+            flash(
+                "La contraseña debe tener al menos 8 caracteres, "
+                "una letra mayúscula, un número y un carácter especial (!@#$%&*).",
+                "danger",
+            )
+            return render_template("auth/register.html")
+
+        # (Opcional) Validación simple de formato de teléfono
+        # Puedes ajustar este regex según tus reglas.
+        if not re.fullmatch(r"[0-9+\-\s]{8,20}", telefono):
+            flash("El teléfono debe contener solo dígitos y/o símbolos + - con longitud válida.", "danger")
             return render_template("auth/register.html")
 
         try:
-            # Para simplificar: se guarda la contraseña en texto plano
-            # en la columna password_hash (coincidiendo con tu diseño actual).
-            query = """
+            # 3) Verificar si ya existe el correo
+            query_email = "SELECT 1 AS existe FROM Clientes WHERE email = ?;"
+            rows_email = execute_query(query_email, (email,), fetch=True)
+            if rows_email:
+                flash("Ya existe una cuenta registrada con ese correo.", "warning")
+                return render_template("auth/register.html")
+
+            # 4) Verificar si ya existe el teléfono
+            query_tel = "SELECT 1 AS existe FROM Clientes WHERE telefono = ?;"
+            rows_tel = execute_query(query_tel, (telefono,), fetch=True)
+            if rows_tel:
+                flash("El teléfono ingresado ya está registrado en otra cuenta.", "warning")
+                return render_template("auth/register.html")
+
+            # 5) Manejo interno de documento (ya no se pide al usuario)
+            #    Cumplimos con NOT NULL + UNIQUE(tipo_documento, numero_documento)
+            tipo_documento = "AUTOGEN"
+            numero_documento = f"TEL-{telefono}"
+
+            # 6) Insertar nuevo cliente
+            #    (Seguimos guardando password en texto plano en password_hash
+            #     para no cambiar la lógica de login todavía.)
+            insert_query = """
                 INSERT INTO Clientes 
                     (nombre_completo, email, telefono, tipo_documento, 
                      numero_documento, password_hash)
-                VALUES (?, ?, ?, 'INE', 'POR_ASIGNAR', ?);
+                VALUES (?, ?, ?, ?, ?, ?);
             """
-            execute_query(query, (nombre, email, telefono, password), fetch=False)
+            execute_query(
+                insert_query,
+                (nombre, email, telefono, tipo_documento, numero_documento, password),
+                fetch=False,
+            )
 
-            flash("Registro exitoso. Por favor inicia sesión.", "success")
-            return redirect(url_for("auth.login"))
+            # 7) Mostrar pantalla de éxito con animación y luego redirigir a login
+            return render_template("auth/register_success.html", nombre=nombre)
 
         except Exception as e:
             flash(f"Error en el registro: {str(e)}", "danger")
 
     return render_template("auth/register.html")
+
 
 
 @auth_bp.route("/logout")

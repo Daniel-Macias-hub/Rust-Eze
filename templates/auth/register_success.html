@@ -1,0 +1,192 @@
+{% extends "layouts/base.html" %}
+{% block title %}Registro completado - Rust-Eze{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="register-success-card text-center">
+
+          <!-- Ícono con animación -->
+          <div class="success-icon-wrapper">
+            <div class="success-icon-circle">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="success-glow"></div>
+          </div>
+
+          <h1 class="mt-3 mb-2">¡Registro completado!</h1>
+
+          <p class="text-soft mb-1">
+            {% if nombre_completo %}
+              {{ nombre_completo }}, tu cuenta ha sido creada correctamente.
+            {% else %}
+              Tu cuenta ha sido creada correctamente.
+            {% endif %}
+          </p>
+          <p class="text-soft mb-4">
+            Serás redirigido al inicio de sesión en unos segundos.
+          </p>
+
+          <!-- Barra de progreso de redirección -->
+          <div class="redirect-bar-wrapper mb-3">
+            <div class="redirect-bar"></div>
+          </div>
+
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-4">
+            <i class="fas fa-arrow-right-to-bracket me-2"></i>
+            Ir al inicio de sesión ahora
+          </a>
+
+          <small class="d-block mt-4 text-muted">
+            Si no eres redirigido automáticamente, haz clic en el botón superior.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Redirección automática en 5 segundos
+  setTimeout(function () {
+    window.location.href = "{{ url_for('auth.login') }}";
+  }, 5000);
+</script>
+
+<style>
+  .register-success-card {
+    position: relative;
+    padding: 3rem 2.5rem 2.5rem;
+    border-radius: 1.8rem;
+    background: radial-gradient(circle at top, #020617, #020617 35%, #020617ee);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow:
+      0 24px 48px rgba(15, 23, 42, 0.85),
+      0 0 0 1px rgba(15, 23, 42, 0.9);
+    overflow: hidden;
+  }
+
+  /* Halo arcoiris girando alrededor de la tarjeta */
+  .register-success-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 180deg,
+      #22c55e,
+      #06b6d4,
+      #6366f1,
+      #ec4899,
+      #f97316,
+      #22c55e
+    );
+    opacity: 0.32;
+    filter: blur(12px);
+    z-index: -2;
+    animation: success-rainbow 14s linear infinite;
+  }
+
+  .register-success-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at top, rgba(15,23,42,0.97), rgba(15,23,42,0.99));
+    z-index: -1;
+  }
+
+  /* Ícono principal */
+  .success-icon-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .success-icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #022c22;
+    font-size: 2.4rem;
+    box-shadow:
+      0 0 0 4px rgba(34, 197, 94, 0.25),
+      0 20px 30px rgba(22, 163, 74, 0.75);
+    animation: success-pop 0.7s ease-out forwards;
+  }
+
+  .success-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 999px;
+    border: 1px solid rgba(34,197,94,0.35);
+    box-shadow: 0 0 35px rgba(34,197,94,0.6);
+    opacity: 0;
+    animation: success-glow 1.1s ease-out 0.4s forwards;
+  }
+
+  .register-success-card h1 {
+    font-size: 2rem;
+    color: #f9fafb;
+    animation: fade-in-up 0.6s ease-out 0.15s backwards;
+  }
+
+  .register-success-card p {
+    animation: fade-in-up 0.6s ease-out 0.25s backwards;
+  }
+
+  .register-success-card .btn-primary {
+    animation: fade-in-up 0.6s ease-out 0.35s backwards;
+  }
+
+  /* Barra de progreso de redirección */
+  .redirect-bar-wrapper {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(31, 41, 55, 0.9);
+    overflow: hidden;
+  }
+
+  .redirect-bar {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #a3e635, #22c55e);
+    animation: redirect-fill 5s linear forwards;
+  }
+
+  /* Animaciones */
+  @keyframes success-rainbow {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes success-pop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    80%  { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes success-glow {
+    0%   { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.05); }
+  }
+
+  @keyframes fade-in-up {
+    0%   { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes redirect-fill {
+    0%   { width: 0; }
+    100% { width: 100%; }
+  }
+</style>
+{% endblock %}

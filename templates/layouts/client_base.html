@@ -57,30 +57,37 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <a href="{{ url_for('admin.vehiculos') }}" class="btn btn-outline-primary w-100 h-100 py-3">
+                        <a href="{{ url_for('admin.vehiculos_list') }}"
+                           class="btn btn-outline-primary w-100 h-100 py-3">
                             <i class="fas fa-car fa-2x mb-2"></i><br>
                             Gestionar Vehículos
                         </a>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <a href="{{ url_for('admin.ventas') }}" class="btn btn-outline-success w-100 h-100 py-3">
+                        <a href="{{ url_for('admin.ventas_list') }}"
+                           class="btn btn-outline-success w-100 h-100 py-3">
                             <i class="fas fa-shopping-cart fa-2x mb-2"></i><br>
-                            Registrar Venta
+                            Registrar / Ver Ventas
                         </a>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <a href="{{ url_for('admin.clientes') }}" class="btn btn-outline-info w-100 h-100 py-3">
+                        <a href="{{ url_for('admin.clientes_list') }}"
+                           class="btn btn-outline-info w-100 h-100 py-3">
                             <i class="fas fa-users fa-2x mb-2"></i><br>
                             Ver Clientes
                         </a>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <a href="{{ url_for('admin.reportes') }}" class="btn btn-outline-warning w-100 h-100 py-3">
+                        <!-- Enlace neutro para evitar BuildError mientras no exista admin.reportes -->
+                        <a href="#"
+                           class="btn btn-outline-warning w-100 h-100 py-3">
                             <i class="fas fa-chart-bar fa-2x mb-2"></i><br>
                             Ver Reportes
                         </a>
@@ -89,11 +96,13 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Actividad Reciente</h5>
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>Actividad Reciente
+                </h5>
             </div>
             <div class="card-body">
                 <div class="list-group list-group-flush">

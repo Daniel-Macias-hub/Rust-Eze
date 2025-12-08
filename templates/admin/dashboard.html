@@ -4,162 +4,247 @@
 {% block content %}
 <div class="container fade-in">
 
-    <!-- Hero / Encabezado -->
-    <section class="hero-shell mb-4">
-        <span class="hero-chip">
-            <i class="fa-solid fa-gauge-high"></i>
-            Panel administrativo
-        </span>
-        <h2 class="hero-title">
-            Resumen de <span class="hero-gradient">Operaciones</span>
-        </h2>
-        <p class="hero-subtitle">
-            Visión general de clientes, inventario y ventas recientes de Rust-Eze Agency.
-        </p>
-    </section>
+  <!-- ==========================
+       HERO / ENCABEZADO
+       ========================== -->
+  <section class="hero-shell mb-4">
+    <span class="hero-chip">
+      <i class="fa-solid fa-gauge-high"></i>
+      Panel administrativo
+    </span>
 
-    <!-- Tarjetas de estadísticas -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-sm text-muted">Vehículos</span>
-                    <i class="fa-solid fa-car-side"></i>
-                </div>
-                <div class="display-6">{{ stats.vehiculos if stats else 0 }}</div>
-                <div class="text-sm text-muted">En inventario total</div>
-            </div>
-        </div>
+    <h2 class="hero-title">
+      Resumen de <span class="hero-gradient">Operaciones</span>
+    </h2>
 
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-sm text-muted">Clientes activos</span>
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="display-6">{{ stats.clientes if stats else 0 }}</div>
-                <div class="text-sm text-muted">Registrados en el sistema</div>
-            </div>
-        </div>
+    <p class="hero-subtitle">
+      Visión general de clientes, inventario y ventas recientes de Rust-Eze Agency.
+    </p>
 
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-sm text-muted">Ventas</span>
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-                <div class="display-6">{{ stats.ventas if stats else 0 }}</div>
-                <div class="text-sm text-muted">Operaciones realizadas</div>
-            </div>
-        </div>
+    <!-- Acciones rápidas de gestión (tarjetas con botón) -->
+    <div class="row g-3 mt-3">
 
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-sm text-muted">Ingresos totales</span>
-                    <i class="fa-solid fa-sack-dollar"></i>
-                </div>
-                <div class="display-6">
-                    {{ format_currency(stats.total_ingresos) if stats and stats.total_ingresos is not none else '$0.00' }}
-                </div>
-                <div class="text-sm text-muted">Sumatoria histórica</div>
+      <!-- Vehículos -->
+      <div class="col-md-4 col-lg-3">
+        <div class="card card-hover-glow">
+          <div class="card-body d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="quick-action-icon qa-vehiculos">
+                <i class="fa-solid fa-car-side"></i>
+              </span>
+              <div>
+                <div class="quick-action-label text-readable">Vehículos</div>
+                <small class="text-soft">Altas, bajas y actualización del inventario.</small>
+              </div>
             </div>
+            <div class="d-flex justify-content-end">
+              <a href="{{ url_for('admin.vehiculos_list') }}"
+                 class="btn btn-sm btn-outline-light">
+                Gestionar
+              </a>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Clientes -->
+      <div class="col-md-4 col-lg-3">
+        <div class="card card-hover-glow">
+          <div class="card-body d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="quick-action-icon qa-clientes">
+                <i class="fa-solid fa-users"></i>
+              </span>
+              <div>
+                <div class="quick-action-label text-readable">Clientes</div>
+                <small class="text-soft">Registro, datos de contacto y estado de cuenta.</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <a href="{{ url_for('admin.clientes_list') }}"
+                 class="btn btn-sm btn-outline-light">
+                Gestionar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empleados -->
+      <div class="col-md-4 col-lg-3">
+        <div class="card card-hover-glow">
+          <div class="card-body d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="quick-action-icon qa-empleados">
+                <i class="fa-solid fa-id-badge"></i>
+              </span>
+              <div>
+                <div class="quick-action-label text-readable">Empleados</div>
+                <small class="text-soft">Roles, accesos y estado laboral.</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <a href="{{ url_for('admin.empleados_list') }}"
+                 class="btn btn-sm btn-outline-light">
+                Gestionar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================
+       TARJETAS DE ESTADÍSTICAS
+       ========================== -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="stat-card card-hover-glow">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-sm text-muted-strong">Vehículos</span>
+          <i class="fa-solid fa-car-side"></i>
+        </div>
+        <div class="display-6 text-readable">{{ stats.vehiculos if stats else 0 }}</div>
+        <div class="text-sm text-soft">En inventario total</div>
+      </div>
     </div>
 
-    <!-- Gráficas + resumen rápido -->
-    <div class="row g-3 mb-4">
-        <div class="col-lg-8">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Ventas por mes</span>
-                    <small class="text-muted">Últimos 12 meses</small>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartVentasMes" height="120"></canvas>
-                </div>
-            </div>
+    <div class="col-md-3">
+      <div class="stat-card card-hover-glow">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-sm text-muted-strong">Clientes activos</span>
+          <i class="fa-solid fa-users"></i>
         </div>
-
-        <div class="col-lg-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    Top modelos vendidos
-                </div>
-                <div class="card-body">
-                    <canvas id="chartTopModelos" height="120"></canvas>
-                </div>
-            </div>
-        </div>
+        <div class="display-6 text-readable">{{ stats.clientes if stats else 0 }}</div>
+        <div class="text-sm text-soft">Registrados en el sistema</div>
+      </div>
     </div>
 
-    <!-- Ventas recientes -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Ventas recientes</span>
-            <a href="{{ url_for('admin.ventas_list') }}" class="btn btn-sm btn-outline-light">
-                <i class="fa-solid fa-list me-1"></i> Ver todas
-            </a>
+    <div class="col-md-3">
+      <div class="stat-card card-hover-glow">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-sm text-muted-strong">Ventas</span>
+          <i class="fa-solid fa-receipt"></i>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-sm table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Empleado</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for v in ventas_recientes %}
-                        <tr>
-                            <td>{{ v.venta_id }}</td>
-                            <td>{{ v.fecha_venta }}</td>
-                            <td>{{ v.cliente }}</td>
-                            <td>{{ v.empleado }}</td>
-                            <td>{{ format_currency(v.total_venta) }}</td>
-                            <td>{{ v.estado_venta }}</td>
-                            <td class="text-end">
-                                <a href="{{ url_for('admin.ventas_detail', venta_id=v.venta_id) }}"
-                                   class="btn btn-outline-light btn-sm">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">
-                                No hay ventas registradas todavía.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="display-6 text-readable">{{ stats.ventas if stats else 0 }}</div>
+        <div class="text-sm text-soft">Operaciones realizadas</div>
+      </div>
     </div>
+
+    <div class="col-md-3">
+      <div class="stat-card card-hover-glow">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-sm text-muted-strong">Ingresos totales</span>
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+        <div class="display-6 text-readable">
+          {{ format_currency(stats.total_ingresos) if stats and stats.total_ingresos is not none else '$0.00' }}
+        </div>
+        <div class="text-sm text-soft">Sumatoria histórica</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================
+       GRÁFICAS
+       ========================== -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card h-100 card-hover-glow dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center dashboard-card-header">
+          <span><i class="fa-solid fa-chart-line me-2"></i> Ventas por mes</span>
+          <small class="text-muted-strong">Últimos 12 meses</small>
+        </div>
+        <div class="card-body chart-shell">
+          <canvas id="chartVentasMes"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card h-100 card-hover-glow dashboard-card">
+        <div class="card-header dashboard-card-header">
+          <i class="fa-solid fa-ranking-star me-2"></i> Top modelos vendidos
+        </div>
+        <div class="card-body chart-shell">
+          <canvas id="chartTopModelos"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================
+       VENTAS RECIENTES
+       ========================== -->
+  <div class="card card-hover-glow">
+    <div class="card-header d-flex justify-content-between align-items-center dashboard-card-header">
+      <span><i class="fa-solid fa-clock-rotate-left me-2"></i> Ventas recientes</span>
+      <a href="{{ url_for('admin.ventas_list') }}" class="btn btn-sm btn-outline-light">
+        <i class="fa-solid fa-list me-1"></i> Ver todas
+      </a>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0 dashboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Empleado</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in ventas_recientes %}
+            <tr>
+              <td>{{ v.venta_id }}</td>
+              <td>{{ v.fecha_venta }}</td>
+              <td>{{ v.cliente }}</td>
+              <td>{{ v.empleado }}</td>
+              <td>{{ format_currency(v.total_venta) }}</td>
+              <td>
+                <span class="badge rounded-pill
+                  {% if v.estado_venta == 'Activa' %}bg-success-soft{% elif v.estado_venta == 'Cancelada' %}bg-danger-soft{% else %}bg-secondary-soft{% endif %}">
+                  {{ v.estado_venta }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a href="{{ url_for('admin.ventas_detail', venta_id=v.venta_id) }}"
+                   class="btn btn-outline-light btn-sm">
+                  <i class="fa-solid fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-muted-strong py-4">
+                No hay ventas registradas todavía.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datos para Chart.js -->
+  <div id="dashboard-data"
+       data-ventas-labels='{{ (ventas_por_mes_labels or [])|tojson|e }}'
+       data-ventas-valores='{{ (ventas_por_mes_valores or [])|tojson|e }}'
+       data-top-labels='{{ (top_modelos_labels or [])|tojson|e }}'
+       data-top-valores='{{ (top_modelos_valores or [])|tojson|e }}'>
+  </div>
 
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Contenedor de datos para evitar errores del validador JS en VS Code -->
-<div id="dashboard-data"
-     data-ventas-labels='{{ (ventas_por_mes_labels or [])|tojson|e }}'
-     data-ventas-valores='{{ (ventas_por_mes_valores or [])|tojson|e }}'
-     data-top-labels='{{ (top_modelos_labels or [])|tojson|e }}'
-     data-top-valores='{{ (top_modelos_valores or [])|tojson|e }}'>
-</div>
-
 <script src="{{ url_for('static', filename='js/adminDashboardCharts.js') }}"></script>
 {% endblock %}
-

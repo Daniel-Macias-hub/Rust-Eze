@@ -1,0 +1,26 @@
+{% extends "layouts/client_base.html" %}
+
+{% block title %}Mi Perfil - Rust-Eze{% endblock %}
+
+{% block client_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Mi perfil</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-user me-2"></i> Datos del cliente
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Nombre:</strong> {{ cliente.nombre_completo }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ cliente.email }}</p>
+                <p class="mb-1"><strong>Teléfono:</strong> {{ cliente.telefono or 'No registrado' }}</p>
+                <p class="mb-1"><strong>Dirección:</strong> {{ cliente.direccion or 'No registrada' }}</p>
+                <p class="mb-0"><strong>Registrado desde:</strong> {{ cliente.fecha_registro }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
