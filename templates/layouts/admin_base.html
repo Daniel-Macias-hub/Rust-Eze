@@ -83,36 +83,4 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
-</html>
-
-# -------------------------------------------------------------------
-# Perfil de cliente
-# -------------------------------------------------------------------
-@client_bp.route("/perfil")
-def perfil():
-    cliente_id = session.get("user_id")
-    if not cliente_id:
-        return redirect(url_for("auth.login"))
-
-    filas = execute_query("""
-        SELECT 
-            cliente_id,
-            nombre_completo,
-            email,
-            telefono,
-            direccion,
-            fecha_registro
-        FROM Clientes
-        WHERE cliente_id = ?
-    """, (cliente_id,))
-
-    if not filas:
-        flash("No se encontró información del cliente.", "warning")
-        return redirect(url_for("client.dashboard"))
-
-    cliente = filas[0]
-
-    return render_template(
-        "client/perfil.html",
-        cliente=cliente
-    )
+</html> 

@@ -2,27 +2,75 @@
 {% block title %}Panel de cliente - Rust-Eze{% endblock %}
 
 {% block client_content %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 client-dashboard-shell">
 
-  <!-- HERO -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm bg-transparent">
-        <div class="card-body px-0">
-          <span class="badge bg-primary bg-gradient mb-2">
-            <i class="fa-solid fa-user-gear me-1"></i> Panel de cliente
+  <!-- ==========================
+       HERO / ENCABEZADO CLIENTE
+       ========================== -->
+  <section class="hero-shell mb-4">
+    <span class="hero-chip">
+      <i class="fa-solid fa-user-gear me-1"></i>
+      Panel de cliente
+    </span>
+
+    <h2 class="hero-title">
+      Explora, elige y compra tu próximo
+      <span class="hero-gradient">vehículo</span>
+    </h2>
+
+    <p class="hero-subtitle">
+      Bienvenido, {{ session.get('user_name') }}. Desde aquí puedes filtrar el catálogo,
+      ver coches populares y comprar tu auto ideal.
+    </p>
+
+    <!-- Acciones rápidas (mismo patrón que admin) -->
+    <div class="row g-3 mt-3 quick-actions-row">
+      <!-- Explorar catálogo (esta misma vista) -->
+      <div class="col-md-4 col-lg-3">
+        <a href="{{ url_for('client.dashboard') }}"
+           class="quick-action-card">
+          <span class="quick-action-icon qa-vehiculos">
+            <i class="fa-solid fa-car-side"></i>
           </span>
-          <h2 class="h3 text-white mb-1">
-            Explora, elige y compra tu próximo vehículo.
-          </h2>
-          <p class="text-soft mb-0">
-            Bienvenido, {{ session.get('user_name') }}. Aquí puedes ver los vehículos disponibles
-            y filtrar según tus preferencias.
-          </p>
-        </div>
+          <div class="quick-action-body">
+            <span class="quick-action-label">Explorar catálogo</span>
+            <small>Vehículos disponibles listos para compra.</small>
+          </div>
+          <span class="quick-action-pill">Ver</span>
+        </a>
+      </div>
+
+      <!-- Mis compras (placeholder) -->
+      <div class="col-md-4 col-lg-3">
+        <a href="#"
+           class="quick-action-card">
+          <span class="quick-action-icon qa-clientes">
+            <i class="fa-solid fa-receipt"></i>
+          </span>
+          <div class="quick-action-body">
+            <span class="quick-action-label">Mis compras</span>
+            <small>Historial de vehículos adquiridos.</small>
+          </div>
+          <span class="quick-action-pill">Revisar</span>
+        </a>
+      </div>
+
+      <!-- Mi perfil -->
+      <div class="col-md-4 col-lg-3">
+        <a href="{{ url_for('client.perfil') }}"
+           class="quick-action-card">
+          <span class="quick-action-icon qa-empleados">
+            <i class="fa-solid fa-id-card"></i>
+          </span>
+          <div class="quick-action-body">
+            <span class="quick-action-label">Mi perfil</span>
+            <small>Datos personales y seguridad de la cuenta.</small>
+          </div>
+          <span class="quick-action-pill">Editar</span>
+        </a>
       </div>
     </div>
-  </div>
+  </section>
 
   <div class="row g-4">
 
@@ -32,10 +80,14 @@
     <div class="col-lg-8">
 
       <!-- FILTROS -->
-      <div class="card mb-4">
+      <div class="card card-hover-glow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span><i class="fa-solid fa-filter me-2"></i> Filtros</span>
-          <button type="button" class="btn btn-sm btn-outline-light" onclick="limpiarFiltros()">
+          <span>
+            <i class="fa-solid fa-filter me-2"></i> Filtros
+          </span>
+          <button type="button"
+                  class="btn btn-sm btn-outline-light"
+                  onclick="limpiarFiltros()">
             Limpiar filtros
           </button>
         </div>
@@ -46,7 +98,7 @@
               <select class="form-select form-select-sm" name="marca" onchange="aplicarFiltros()">
                 <option value="">Todas</option>
                 {% for marca in marcas %}
-                <option value="{{ marca|lower }}">{{ marca }}</option>
+                  <option value="{{ marca|lower }}">{{ marca }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -56,7 +108,7 @@
               <select class="form-select form-select-sm" name="modelo" onchange="aplicarFiltros()">
                 <option value="">Todos</option>
                 {% for modelo in modelos %}
-                <option value="{{ modelo|lower }}">{{ modelo }}</option>
+                  <option value="{{ modelo|lower }}">{{ modelo }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -66,7 +118,7 @@
               <select class="form-select form-select-sm" name="anio" onchange="aplicarFiltros()">
                 <option value="">Todos</option>
                 {% for anio in anios %}
-                <option value="{{ anio }}">{{ anio }}</option>
+                  <option value="{{ anio }}">{{ anio }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -76,7 +128,7 @@
               <select class="form-select form-select-sm" name="tipo" onchange="aplicarFiltros()">
                 <option value="">Todos</option>
                 {% for tipo in tipos %}
-                <option value="{{ tipo|lower }}">{{ tipo }}</option>
+                  <option value="{{ tipo|lower }}">{{ tipo }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -104,7 +156,7 @@
 
       <!-- CATÁLOGO -->
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="text-white mb-0">
+        <h5 class="text-readable mb-0">
           Vehículos disponibles
         </h5>
         <span class="badge bg-success">
@@ -116,7 +168,7 @@
         {% if vehiculos %}
           {% for v in vehiculos %}
           <div class="col-md-6">
-            <div class="card vehicle-card h-100 vehiculo-item"
+            <div class="card vehicle-card card-hover-glow h-100 vehiculo-item"
                  data-marca="{{ v.marca|lower }}"
                  data-modelo="{{ v.modelo|lower }}"
                  data-tipo="{{ v.tipo|lower }}"
@@ -127,14 +179,14 @@
                    class="card-img-top vehicle-img"
                    alt="{{ v.marca }} {{ v.modelo }}">
               {% else %}
-              <div class="bg-dark d-flex align-items-center justify-content-center" style="height: 180px;">
+              <div class="bg-dark d-flex align-items-center justify-content-center vehicle-img">
                 <i class="fa-solid fa-car fa-3x text-muted"></i>
               </div>
               {% endif %}
 
               <div class="card-body d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <h6 class="mb-0 text-white">{{ v.marca }} {{ v.modelo }}</h6>
+                  <h6 class="mb-0 text-readable">{{ v.marca }} {{ v.modelo }}</h6>
                   <span class="badge bg-secondary">{{ v.anio }}</span>
                 </div>
                 <p class="text-soft mb-2">
@@ -144,7 +196,7 @@
                   {{ v.descripcion or 'Vehículo en excelentes condiciones, listo para entrega.' }}
                 </p>
                 <div class="d-flex justify-content-between align-items-center mt-2">
-                  <span class="price-tag text-success fw-bold">
+                  <span class="price-tag">
                     ${{ "{:,.2f}".format(v.precio) }}
                   </span>
                   <form method="POST"
@@ -160,10 +212,10 @@
           {% endfor %}
         {% else %}
         <div class="col-12">
-          <div class="card text-center">
+          <div class="card card-hover-glow text-center">
             <div class="card-body">
               <i class="fa-solid fa-car-burst fa-3x text-muted mb-3"></i>
-              <p class="text-muted mb-0">No hay vehículos disponibles por el momento.</p>
+              <p class="text-soft mb-0">No hay vehículos disponibles por el momento.</p>
             </div>
           </div>
         </div>
@@ -177,28 +229,27 @@
          ====================================== -->
     <div class="col-lg-4">
 
-      <!-- RESUMEN RÁPIDO (se mantiene) -->
-      <div class="card mb-4">
+      <!-- RESUMEN RÁPIDO -->
+      <div class="card card-hover-glow mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span><i class="fa-solid fa-gauge-high me-2"></i> Resumen rápido</span>
         </div>
         <div class="card-body">
           <p class="mb-1 text-soft">Vehículos listos para ti</p>
-          <div class="display-4 fw-bold text-primary">
+          <div class="display-4 fw-bold text-readable">
             {{ resumen.vehiculos_disponibles }}
           </div>
-          <p class="text-muted small mb-0">
-            Puedes filtrar por marca, modelo, año, tipo y rango de precio para encontrar
-            el vehículo ideal.
+          <p class="text-soft small mb-0">
+            Filtra por marca, modelo, año, tipo y rango de precio para encontrar el vehículo ideal.
           </p>
         </div>
       </div>
 
       <!-- COCHES POPULARES -->
-      <div class="card">
+      <div class="card card-hover-glow">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span><i class="fa-solid fa-fire me-2"></i> Coches populares</span>
-          <small class="text-muted">Más solicitados</small>
+          <small class="text-muted-strong">Más solicitados</small>
         </div>
         <div class="card-body">
           {% if populares %}
@@ -216,7 +267,7 @@
               {% endif %}
               <div class="flex-grow-1">
                 <div class="d-flex justify-content-between">
-                  <h6 class="mb-0 text-white">{{ p.marca }} {{ p.modelo }}</h6>
+                  <h6 class="mb-0 text-readable">{{ p.marca }} {{ p.modelo }}</h6>
                   <span class="badge bg-secondary">{{ p.anio }}</span>
                 </div>
                 <small class="text-soft d-block mb-1">
@@ -238,7 +289,7 @@
             {% endfor %}
           </div>
           {% else %}
-          <p class="text-muted mb-0 small">
+          <p class="text-soft mb-0 small">
             Aún no hay suficiente movimiento para mostrar coches populares.
           </p>
           {% endif %}
@@ -283,11 +334,9 @@
       const okAnio = !anio || dAnio === anio;
       const okPrecio = dPrecio >= precioMin && dPrecio <= precioMax;
 
-      if (okMarca && okModelo && okTipo && okAnio && okPrecio) {
-        item.style.display = '';
-      } else {
-        item.style.display = 'none';
-      }
+      item.style.display = (okMarca && okModelo && okTipo && okAnio && okPrecio)
+        ? ''
+        : 'none';
     });
   }
 
@@ -304,26 +353,19 @@
 </script>
 
 <style>
-  .text-soft {
-    color: #9ca3af;
+  /* Fondo del panel de cliente: sobrescribe el body blanco de Bootstrap
+     SOLO en esta vista (por estar en este template). */
+  body {
+    background: radial-gradient(circle at 0% 0%, #020617 0%, #020617 35%, #0b1120 75%, #111827 100%) !important;
+    color: #f9fafb;
   }
 
-  .price-tag {
-    font-size: 1.05rem;
+  /* Evitar fondos blancos en contenedores principales */
+  .client-dashboard-shell {
+    background-color: transparent !important;
   }
 
-  .vehicle-card {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 1rem;
-    overflow: hidden;
-  }
-
-  .vehicle-card .vehicle-img {
-    height: 170px;
-    object-fit: cover;
-  }
-
+  /* Listado de populares (estilos específicos de esta vista) */
   .popular-thumb {
     width: 72px;
     height: 56px;
